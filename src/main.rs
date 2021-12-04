@@ -1,5 +1,4 @@
-use std::io::stdin;
-use std::error::Error;
+use std::io::{stdin, Error};
 
 pub struct InputStringBuffer {
     pub buffer: String,
@@ -43,9 +42,13 @@ fn print_prompt() {
     println!("db > ");
 }
 
-fn read_from_stdin() -> Result<(String, usize), Box<dyn Error>> {
+fn read_from_stdin() -> Result<(String, usize), Error> {
     let mut line = String::new();
     let bytes_read = stdin().read_line(&mut line)?;
+
+    if bytes_read <= 0 {
+        panic!("Error reading from stdin");
+    }
 
     // ignore '\r\n'
     line.pop();
