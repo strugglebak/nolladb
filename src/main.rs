@@ -31,6 +31,7 @@ fn main() {
             _ if
                 input_string_buffer.buffer == ".exit" ||
                 input_string_buffer.buffer == ".quit" => {
+                    println!("db exit");
                     break;
                 },
             _ => println!("Unrecognized command '{}'.\n", input_string_buffer.buffer),
