@@ -1,5 +1,7 @@
 use std::io::{stdin, Error};
 use std::process;
+use std::io;
+use std::io::Write; // <--- bring flush() into scope
 
 #[derive(PartialEq)]
 pub enum MetaCommand {
@@ -74,7 +76,8 @@ fn main() {
 }
 
 fn print_prompt() {
-    println!("db > ");
+    print!("db > ");
+    io::stdout().flush().unwrap();
 }
 
 fn read_from_stdin() -> Result<(String, usize), Error> {
