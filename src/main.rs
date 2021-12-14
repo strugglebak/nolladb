@@ -1,7 +1,40 @@
-use std::io::{stdin, Error};
+use std::io::{self,stdin,Error,ErrorKind};
 use std::process;
-use std::io;
 use std::io::Write; // <--- bring flush() into scope
+
+extern crate arrayvec;
+use arrayvec::ArrayString;
+
+#[macro_use] extern crate scan_fmt;
+macro_rules! field_size {
+    ($t:ident :: $field:ident) => {{
+        let m = core::mem::MaybeUninit::<$t>::uninit();
+        let p = unsafe {
+            core::ptr::addr_of!((*(&m as *const _ as *const $t)).$field)
+        };
+
+        const fn size_of_raw<T>(_: *const T) -> usize {
+            core::mem::size_of::<T>()
+        }
+        size_of_raw(p)
+    }};
+}
+
+const COLUMN_USERNAME_SIZE: usize = 32;
+const COLUMN_EMAIL_SIZE: usize = 255;
+type Username = ArrayString::<COLUMN_USERNAME_SIZE>;
+type Email = ArrayString::<COLUMN_EMAIL_SIZE>;
+
+const SIZE_OF_ID: usize = field_size!(Row::id);
+const SIZE_OF_USERNAME: usize = field_size!(Row::username);
+const SIZE_OF_EMAIL: usize = field_size!(Row::email);
+
+const OFFSET_OF_ID: usize = 0;
+const OFFSET_OF_USERNAME: usize = SIZE_OF_ID + OFFSET_OF_ID;
+const OFFSET_OF_EMAIL: usize = SIZE_OF_USERNAME + OFFSET_OF_USERNAME;
+
+const SIZE_OF_ROW: usize = SIZE_OF_ID + SIZE_OF_USERNAME + SIZE_OF_EMAIL;
+
 
 #[derive(PartialEq)]
 pub enum MetaCommand {
@@ -35,6 +68,22 @@ impl InputStringBuffer {
     }
 }
 
+#[derive(Debug)]
+pub struct Row {
+    pub id: u32,
+    pub username: Username,
+    pub email: Email,
+}
+impl Row {
+    fn new() -> Self {
+        Self {
+            id: 0,
+            username: Username::new(),
+            email: Email::new(),
+        }
+    }
+}
+
 fn main() {
     loop {
         let mut input_string_buffer = InputStringBuffer::new();
@@ -59,7 +108,7 @@ fn main() {
         }
 
         let mut s = StatementType::StatementTypeDefault;
-        if let Ok((prepare, statement_type)) = handle_prepare_statement(&input_string_buffer) {
+        if let Ok((prepare, statement_type, row_data)) = handle_prepare_statement(&input_string_buffer) {
             s = statement_type;
             if prepare == Prepare::PrepareSuccess {
                 // TODO:
@@ -109,21 +158,42 @@ fn handle_meta_command<'a>(input_string_buffer: &'a InputStringBuffer)
 }
 
 fn handle_prepare_statement<'a>(input_string_buffer: &'a InputStringBuffer)
-    -> Result<(Prepare, StatementType), ()> {
+    -> Result<(Prepare, StatementType, Row), String> {
     let start_with_insert = input_string_buffer.buffer.starts_with("insert");
     let is_select = input_string_buffer.buffer == "select";
+    let mut row_data = Row::new();
     match input_string_buffer.buffer {
-        _ if start_with_insert => Ok((
-            Prepare::PrepareSuccess,
-            StatementType::StatementTypeInsert
-        )),
+        _ if start_with_insert => {
+            if let (Some(id), Some(username), Some(email)) = scan_fmt_some!(
+                &input_string_buffer.buffer,
+                // TODO: here use regex
+                "insert {} {} {}",
+                u32,
+                String,
+                String
+            ) {
+                row_data.id = id;
+                row_data.username.push_str(&username);
+                row_data.email.push_str(&email);
+            } else {
+                // TODO: handle error
+                return Err(String::from("Error: insert error"));
+            }
+            Ok((
+                Prepare::PrepareSuccess,
+                StatementType::StatementTypeInsert,
+                row_data,
+            ))
+        },
         _ if is_select => Ok((
             Prepare::PrepareSuccess,
-            StatementType::StatementTypeSelect
+            StatementType::StatementTypeSelect,
+            row_data,
         )),
         _ => Ok((
             Prepare::PrepareUnrecognizedStatement,
-            StatementType::StatementTypeDefault
+            StatementType::StatementTypeDefault,
+            row_data,
         )),
     }
 }
