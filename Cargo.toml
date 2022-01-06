@@ -8,3 +8,7 @@ edition = "2021"
 [dependencies]
 thiserror = "1.0.30"
 sqlparser = "0.13.0"
+rstest = "0.12"
+
+[dev-dependencies]
+pretty_assertions = "1.0"
