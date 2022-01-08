@@ -115,7 +115,7 @@ impl Validator for RealEvalPrintLoopHelper {
 // 返回: Config::builder 的 Editor 基础配置
 pub fn get_config() -> Config {
   Config::builder()
-    .history_ignore_dups(true)
+    .history_ignore_space(true)
     .completion_type(CompletionType::List)
     .edit_mode(EditMode::Vi)
     .output_stream(OutputStreamType::Stdout)
