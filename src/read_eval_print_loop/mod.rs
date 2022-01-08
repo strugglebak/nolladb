@@ -116,8 +116,8 @@ impl Validator for RealEvalPrintLoopHelper {
 pub fn get_config() -> Config {
   Config::builder()
     .history_ignore_space(true)
-    .completion_type(CompletionType::List)
     .edit_mode(EditMode::Vi)
+    .completion_type(CompletionType::Circular)
     .output_stream(OutputStreamType::Stdout)
     .build()
 }
