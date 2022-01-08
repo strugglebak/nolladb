@@ -4,8 +4,9 @@ use rustyline_derive::{Completer, Helper};
 use rustyline::hint::{Hinter, HistoryHinter};
 use rustyline::highlight::{Highlighter, MatchingBracketHighlighter};
 use rustyline::validate::{Validator, ValidationContext, ValidationResult};
-use rustyline::{Context};
+use rustyline::{Context, Config, CompletionType, EditMode};
 use rustyline::error::ReadlineError;
+use rustyline::config::OutputStreamType;
 
 #[derive(Completer, Helper)]
 pub struct RealEvalPrintLoopHelper {
@@ -108,4 +109,14 @@ impl Validator for RealEvalPrintLoopHelper {
 
     Ok(result)
   }
+}
+
+// 返回: Config::builder 的 Editor 基础配置
+pub fn get_config() -> Config {
+  Config::builder()
+    .history_ignore_dups(true)
+    .completion_type(CompletionType::List)
+    .edit_mode(EditMode::Vi)
+    .output_stream(OutputStreamType::Stdout)
+    .build()
 }
