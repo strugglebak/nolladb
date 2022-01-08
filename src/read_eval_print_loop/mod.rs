@@ -99,7 +99,8 @@ impl Validator for RealEvalPrintLoopHelper {
     let input = context.input();
     let result = if input.starts_with(".") {
       Valid(None)
-    } else if !input.starts_with(";") {
+    } else if !input.ends_with(";") {
+      // 没遇到分号，表示还在输入中
       Incomplete
     } else {
       Valid(None)
