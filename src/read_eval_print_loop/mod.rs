@@ -15,6 +15,7 @@ pub struct RealEvalPrintLoopHelper {
   pub highlighter: MatchingBracketHighlighter,
 }
 
+// 这里必须要实现 Default 这个 trait，不然上面的 derive Helper 会报错
 impl Default for RealEvalPrintLoopHelper {
   fn default() -> Self {
     Self {
