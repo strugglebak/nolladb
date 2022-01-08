@@ -8,15 +8,18 @@ use rustyline::error::ReadlineError;
 
 use meta_command::handle_meta_command;
 use read_eval_print_loop::{
-  get_config,
   RealEvalPrintLoopHelper,
+  CommandType,
+  get_config,
+  get_command_type,
 };
 
-fn main() {
-  // 获取 repl 配置
-  let repl_config = get_config();
+fn main() -> rustyline::Result<()> {
   // 创建 repl helper
   let repl_helper = RealEvalPrintLoopHelper::default();
+
+  // 获取 repl 配置
+  let repl_config = get_config();
 
   // 用 repl 配置和 repl helper 初始化 repl
   let mut repl = Editor::with_config(repl_config);
@@ -37,8 +40,19 @@ fn main() {
     let readline = repl.readline(&print);
     match readline {
       Ok(command) => {
-        // TODO:
-        println!("{}", command);
+        repl.add_history_entry(command.as_str());
+        let command_type = get_command_type(&command.trim().to_owned());
+        match command_type {
+          CommandType::MetaCommand(cmd) => {
+            match handle_meta_command(cmd, &mut repl) {
+              Ok(response) => println!("{}", response),
+              Err(error) => eprintln!("An error occurred: {:?}", error),
+            }
+          },
+          CommandType::SQLCommand(cmd) => {
+            // TODO:
+          }
+        }
       },
       Err(ReadlineError::Interrupted) => break,
       Err(ReadlineError::Eof) => break,
@@ -48,4 +62,8 @@ fn main() {
       }
     }
   }
+
+  repl.append_history("history").unwrap();
+
+  Ok(())
 }
