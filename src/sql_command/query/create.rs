@@ -23,22 +23,23 @@ impl CreateQuery {
         name,
         columns,
         constraints,
-        with_options,
-        external,
-        file_format,
-        location,
+        // with_options,
+        // external,
+        // file_format,
+        // location,
         ..
       } => {
-        let (table_name, table_metadata_columns: mut Vec<SchemaOfSQLColumn>) = (name, vec![]);
+        let table_name = name;
+        let mut table_metadata_columns: Vec<SchemaOfSQLColumn> = vec![];
 
-        /// 处理 columns
+        // 处理 columns
         for column in columns {
           let column_name = column.name.to_string();
 
           // 先检查在创建表时有没有插入相同名字的 column
           if table_metadata_columns
               .iter()
-              .any(|table_metadata_column| table_metadata_column.name == column_name) {
+              .any(|table_metadata_column| table_metadata_column.column_name == column_name) {
             return Err(
               NollaDBError::Internal(
                 format!("Duplicate column name: {}", &column_name)
@@ -46,10 +47,10 @@ impl CreateQuery {
             )
           }
 
-          let mut column_datatype = match &column.data_type {
-            DataType::SmallInt => "Integer",
-            DataType::Int => "Integer",
-            DataType::BigInt => "Integer",
+          let column_datatype = match &column.data_type {
+            DataType::SmallInt(_) => "Integer", // bytes
+            DataType::Int(_) => "Integer", // bytes
+            DataType::BigInt(_) => "Integer", // bytes
             DataType::Boolean => "Bool",
             DataType::Text => "Text",
             DataType::Varchar(_) => "Text", // bytes
@@ -63,11 +64,9 @@ impl CreateQuery {
             }
           };
 
-          let (
-            is_primary_key: mut bool,
-            is_unique_constraint: mut bool,
-            is_not_null_constraint: mut bool,
-          ) = (false, false, false);
+          let mut is_primary_key: bool = false;
+          let mut is_unique_constraint: bool = false;
+          let mut is_not_null_constraint: bool = false;
 
           for column_option in &column.options {
             match column_option.option {
@@ -112,7 +111,7 @@ impl CreateQuery {
           });
         }
 
-        /// TODO: 处理 constraints
+        // TODO: 处理 constraints
         for constraint in constraints {
           println!("{:?}", constraint);
         }
