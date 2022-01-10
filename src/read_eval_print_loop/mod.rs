@@ -9,7 +9,7 @@ use rustyline::error::ReadlineError;
 use rustyline::config::OutputStreamType;
 
 use crate::meta_command::MetaCommand;
-use crate::sql_command::SQLCommand;
+use crate::sql_query::SQLQuery;
 
 #[derive(Completer, Helper)]
 pub struct RealEvalPrintLoopHelper {
@@ -21,7 +21,7 @@ pub struct RealEvalPrintLoopHelper {
 #[derive(Debug, PartialEq)]
 pub enum CommandType {
   MetaCommand(MetaCommand),
-  SQLCommand(SQLCommand),
+  SQLQuery(SQLQuery),
 }
 
 // 这里必须要实现 Default 这个 trait，不然上面的 derive Helper 会报错
@@ -134,6 +134,6 @@ pub fn get_config() -> Config {
 pub fn get_command_type(command: &String) -> CommandType {
   match command.starts_with(".") {
     true => CommandType::MetaCommand(MetaCommand::new(command.to_owned())),
-    false => CommandType::SQLCommand(SQLCommand::new(command.to_owned())),
+    false => CommandType::SQLQuery(SQLQuery::new(command.to_owned())),
   }
 }
