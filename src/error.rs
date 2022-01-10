@@ -12,7 +12,7 @@ pub enum NollaDBError {
   #[error("Unknown command error: {0}")]
   UnknownCommand(String),
   #[error("SQL Parse error: {0:?}")]
-  SQLParse(#[from] ParserError),
+  SQLParseError(#[from] ParserError),
   #[error("To be Implemented error: {0}")]
   ToBeImplemented(String),
 }
@@ -69,7 +69,7 @@ mod tests {
   #[case("SQL parse error.")]
   fn nolladb_sql_parse_error_test(#[case] input: &str) {
       let expected = format!("SQL Parse error: ParserError(\"{}\")", input);
-      let result = format!("{}", NollaDBError::SQLParse(ParserError::ParserError(input.to_string())));
+      let result = format!("{}", NollaDBError::SQLParseError(ParserError::ParserError(input.to_string())));
 
       assert_eq!(result, expected);
   }
