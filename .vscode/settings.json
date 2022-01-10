@@ -4,6 +4,9 @@
     "Nolla",
     "nolladb",
     "ReadlineError",
-    "rustyline"
+    "rstest",
+    "rustyline",
+    "sqlparser",
+    "thiserror"
   ]
 }
