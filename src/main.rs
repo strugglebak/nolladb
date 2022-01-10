@@ -27,7 +27,7 @@ fn main() -> rustyline::Result<()> {
   repl.set_helper(Some(repl_helper));
 
   // 加载历史记录
-  if repl.load_history("history").is_err() {
+  if repl.load_history(".history").is_err() {
     println!("No more history.");
   }
 
@@ -67,7 +67,7 @@ fn main() -> rustyline::Result<()> {
     }
   }
 
-  repl.append_history("history").unwrap();
+  repl.append_history(".history").unwrap();
 
   Ok(())
 }
