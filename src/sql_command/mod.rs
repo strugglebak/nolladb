@@ -1,3 +1,5 @@
+use crate::error::{Result, NollaDBError};
+
 #[derive(Debug, PartialEq)]
 pub enum SQLCommand {
   CreateTable(String),
@@ -21,4 +23,10 @@ impl SQLCommand {
       _ => SQLCommand::Unknown(command),
     }
   }
+}
+
+pub fn handle_sql_command(query: &str) -> Result<String> {
+  let message: String = String::from("");
+
+  Ok(message)
 }
