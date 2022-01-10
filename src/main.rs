@@ -1,12 +1,13 @@
 mod error;
 mod meta_command;
-mod sql_command;
+mod sql_query;
 mod read_eval_print_loop;
 
 use rustyline::Editor;
 use rustyline::error::ReadlineError;
 
 use meta_command::handle_meta_command;
+use sql_query::handle_sql_query;
 use read_eval_print_loop::{
   RealEvalPrintLoopHelper,
   CommandType,
@@ -49,8 +50,11 @@ fn main() -> rustyline::Result<()> {
               Err(error) => eprintln!("An error occurred: {:?}", error),
             }
           },
-          CommandType::SQLCommand(cmd) => {
-            // TODO:
+          CommandType::SQLQuery(_) => {
+            match handle_sql_query(&command) {
+              Ok(response) => println!("{}", response),
+              Err(error) => eprintln!("An error occurred: {:?}", error),
+            }
           }
         }
       },
