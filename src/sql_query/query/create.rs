@@ -121,7 +121,7 @@ impl CreateQuery {
           table_metadata_columns,
         })
       },
-      _ => return Err(NollaDBError::Internal("Parsing SQL query error".to_string())),
+      _ => return Err(NollaDBError::Internal("Parsing CREATE SQL query error".to_string())),
     }
   }
 }
