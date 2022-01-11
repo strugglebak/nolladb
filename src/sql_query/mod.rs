@@ -6,7 +6,8 @@ use sqlparser::ast::Statement;
 
 use crate::error::{Result, NollaDBError};
 
-use query::create::CreateQuery;
+use query::create::{CreateQuery};
+use query::insert::{InsertQuery};
 
 #[derive(Debug, PartialEq)]
 pub enum SQLQuery {
@@ -79,9 +80,14 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
     Statement::Insert {
       ..
     } => {
-      // TODO: 在表中插入
-      message = String::from("INSERT statement done.");
-      println!("{}", message.to_string());
+      match InsertQuery::new(&statement) {
+        Ok(insert_query) => {
+          // TODO: 在表中插入
+          message = String::from("INSERT statement done.");
+          println!("{}", message.to_string());
+        },
+        Err(error) => return Err(error),
+      }
     },
     Statement::Update {
       ..
