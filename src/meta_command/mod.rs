@@ -63,7 +63,7 @@ pub fn handle_meta_command(
       "{}{}{}{}{}{}{}{}{}",
       "Special commands:\n",
       ".help            - Display help message\n",
-      "-----------------------------------------\n",
+      "---------------------------------------\n",
       ".ast  <QUERY>    - Show the abstract syntax tree for QUERY.\n",
       ".exit            - Quits this application\n",
       ".open <FILENAME> - Close existing database and reopen FILENAME\n",
@@ -73,9 +73,7 @@ pub fn handle_meta_command(
     )),
     MetaCommand::Open(args) => Ok(format!("To be implemented: {}", args)),
     MetaCommand::Unknown => Err(NollaDBError::UnknownCommand(format!(
-      "{}{}",
-      "Unknown command or invalid arguments.\n",
-      "Enter '.help'\n"
+      "Unknown command or invalid arguments. Enter '.help'"
     ))),
   }
 }
