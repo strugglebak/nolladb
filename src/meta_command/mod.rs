@@ -8,7 +8,11 @@ pub enum MetaCommand {
   Exit,
   Quit,
   Help,
+  Tables,
   Open(String),
+  Read(String),
+  Save(String),
+  Ast(String),
   Unknown,
 }
 
@@ -22,7 +26,11 @@ impl MetaCommand {
       ".exit" => MetaCommand::Exit,
       ".quit" => MetaCommand::Quit,
       ".help" => MetaCommand::Help,
+      ".tables" => MetaCommand::Tables,
       ".open" => MetaCommand::Open(command),
+      ".read" => MetaCommand::Read(command),
+      ".save" => MetaCommand::Save(command),
+      ".ast" => MetaCommand::Ast(command),
       _ => MetaCommand::Unknown,
     }
   }
@@ -35,7 +43,11 @@ impl fmt::Display for MetaCommand {
       MetaCommand::Exit => f.write_str(".exit"),
       MetaCommand::Quit => f.write_str(".quit"),
       MetaCommand::Help => f.write_str(".help"),
+      MetaCommand::Tables => f.write_str(".tables"),
       MetaCommand::Open(_) => f.write_str(".open"),
+      MetaCommand::Read(_) => f.write_str(".read"),
+      MetaCommand::Save(_) => f.write_str(".save"),
+      MetaCommand::Ast(_) => f.write_str(".ast"),
       MetaCommand::Unknown => f.write_str("Unknown command"),
     }
   }
@@ -71,7 +83,11 @@ pub fn handle_meta_command(
       ".save <FILENAME> - Write in-memory database into FILENAME\n",
       ".tables          - List names of tables\n",
     )),
+    MetaCommand::Tables => Ok(format!("To be implemented: {}", ".tables".to_string())),
     MetaCommand::Open(args) => Ok(format!("To be implemented: {}", args)),
+    MetaCommand::Read(args) => Ok(format!("To be implemented: {}", args)),
+    MetaCommand::Save(args) => Ok(format!("To be implemented: {}", args)),
+    MetaCommand::Ast(args) => Ok(format!("To be implemented: {}", args)),
     MetaCommand::Unknown => Err(NollaDBError::UnknownCommand(format!(
       "Unknown command or invalid arguments. Enter '.help'"
     ))),
