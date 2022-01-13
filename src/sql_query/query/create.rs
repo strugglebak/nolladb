@@ -18,6 +18,10 @@ pub struct CreateQuery {
 
 impl CreateQuery {
   pub fn new(statement: &Statement) -> Result<CreateQuery> {
+    #[allow(unused_assignments)]
+    let mut option_table_name: Option<String> = None;
+    let mut table_metadata_columns: Vec<SchemaOfSQLColumn> = vec![];
+
     match statement {
       Statement::CreateTable {
         name,
@@ -29,8 +33,7 @@ impl CreateQuery {
         // location,
         ..
       } => {
-        let table_name = name;
-        let mut table_metadata_columns: Vec<SchemaOfSQLColumn> = vec![];
+        option_table_name = Some(name.to_string());
 
         // 处理 columns
         for column in columns {
@@ -87,7 +90,7 @@ impl CreateQuery {
                         .any(|table_metadata_column| table_metadata_column.is_primary_key == true) {
                       return Err(
                         NollaDBError::Internal(
-                          format!("Table '{}' has more than one PRIMARY KEY", &table_name)
+                          format!("Table '{}' has more than one PRIMARY KEY", &name)
                         )
                       )
                     }
@@ -116,11 +119,15 @@ impl CreateQuery {
           println!("{:?}", constraint);
         }
 
-        return Ok(CreateQuery {
-          table_name: table_name.to_string(),
-          table_metadata_columns,
-        })
       },
+      _ => return Err(NollaDBError::Internal("Parsing CREATE SQL query error".to_string())),
+    }
+
+    match option_table_name {
+      Some(table_name) => Ok(CreateQuery {
+          table_name,
+          table_metadata_columns,
+        }),
       _ => return Err(NollaDBError::Internal("Parsing CREATE SQL query error".to_string())),
     }
   }
