@@ -2,6 +2,7 @@ mod error;
 mod meta_command;
 mod sql_query;
 mod read_eval_print_loop;
+mod table;
 
 use rustyline::Editor;
 use rustyline::error::ReadlineError;

@@ -28,10 +28,10 @@ impl Row {
 
   fn get_serialized_column_data(&self) -> Vec<String> {
     match self {
-      Row::Integer(tree) => tree.iter().map(|(_key, value)| value.to_string*()).collect(),
-      Row::Bool(tree) => tree.iter().map(|(_key, value)| value.to_string*()).collect(),
-      Row::Text(tree) => tree.iter().map(|(_key, value)| value.to_string*()).collect(),
-      Row::Real(tree) => tree.iter().map(|(_key, value)| value.to_string*()).collect(),
+      Row::Integer(tree) => tree.iter().map(|(_key, value)| value.to_string()).collect(),
+      Row::Bool(tree) => tree.iter().map(|(_key, value)| value.to_string()).collect(),
+      Row::Text(tree) => tree.iter().map(|(_key, value)| value.to_string()).collect(),
+      Row::Real(tree) => tree.iter().map(|(_key, value)| value.to_string()).collect(),
       Row::None => panic!("Found None Type in columns"),
     }
   }

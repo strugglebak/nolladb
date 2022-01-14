@@ -22,12 +22,12 @@ pub struct Column {
 impl Column {
   pub fn new(
     column_name: String,
-    column_datatype: String,
+    column_datatype: DataType,
     is_primary_key: bool,
     is_unique_constraint: bool,
     is_not_null_constraint: bool,
   ) -> Self {
-    let cd = DataType::new(column_datatype);
+    let cd = DataType::new(column_datatype.to_string());
     let index = match column_datatype {
       DataType::Integer => Index::Integer(BTreeMap::new()),
       DataType::Bool => Index::None,
