@@ -16,7 +16,7 @@ pub struct Column {
   pub is_unique_constraint: bool,
   pub is_not_null_constraint: bool,
   pub is_indexed: bool,
-  pub index: Index;
+  pub index: Index,
 }
 
 impl Column {
