@@ -108,7 +108,7 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
         NollaDBError::ToBeImplemented(
           "Other SQL statement will to be implemented soon.".to_string()
         )
-      )
+      );
     },
   };
 

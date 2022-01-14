@@ -47,7 +47,7 @@ impl CreateQuery {
               NollaDBError::Internal(
                 format!("Duplicate column name: {}", &column_name)
               )
-            )
+            );
           }
 
           let column_datatype = match &column.data_type {
@@ -92,7 +92,7 @@ impl CreateQuery {
                         NollaDBError::Internal(
                           format!("Table '{}' has more than one PRIMARY KEY", &name)
                         )
-                      )
+                      );
                     }
                   }
                 }
