@@ -2,6 +2,7 @@ use sqlparser::ast::{Statement, DataType, ColumnOption};
 use crate::error::{Result, NollaDBError};
 
 #[derive(Debug, PartialEq)]
+// TODO: 待优化
 pub struct SchemaOfSQLColumn {
   pub column_name: String,
   pub column_datatype: String,

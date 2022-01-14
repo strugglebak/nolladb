@@ -1,5 +1,5 @@
 mod index;
-mod data_type;
+pub mod data_type;
 
 use std::collections::{BTreeMap};
 

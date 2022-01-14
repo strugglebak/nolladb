@@ -1,4 +1,4 @@
-mod query;
+pub mod query;
 
 use sqlparser::parser::{Parser, ParserError};
 use sqlparser::dialect::SQLiteDialect;
