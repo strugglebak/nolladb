@@ -11,6 +11,7 @@ sqlparser = "0.13.0"
 rstest = "0.12"
 rustyline = "9.1.2"
 rustyline-derive = "0.6.0"
+serde = "1.0.133"
 
 [dev-dependencies]
 pretty_assertions = "1.0"

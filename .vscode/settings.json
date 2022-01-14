@@ -6,6 +6,7 @@
     "ReadlineError",
     "rstest",
     "rustyline",
+    "serde",
     "sqlparser",
     "thiserror"
   ]
