@@ -11,6 +11,7 @@ use crate::sql_query::query::create::{
   CreateQuery,
   SchemaOfSQLColumn,
 };
+use crate::error::{Result, NollaDBError};
 
 use row::Row;
 use column::Column;
@@ -125,5 +126,33 @@ impl Table {
       table_rows,
       table_columns,
     }
+  }
+
+  pub fn has_column(&self, column_name: String) -> bool {
+    self
+      .table_columns
+      .iter()
+      .any(|table_column| table_column.column_name == column_name)
+  }
+
+  pub fn get_column(&mut self, column_name: String) -> Result<&Column> {
+    for table_column in self.table_columns.iter() {
+      if table_column.column_name == column_name {
+        return Ok(table_column)
+      }
+    }
+
+    Err(NollaDBError::General(String::from("Column not found.")))
+  }
+
+  pub fn get_column_mut(&mut self, column_name: String) -> Result<&mut Column> {
+    // TODO: 待优化
+    for table_column in self.table_columns.iter_mut() {
+      if table_column.column_name == column_name {
+        return Ok(table_column)
+      }
+    }
+
+    Err(NollaDBError::General(String::from("Column not found.")))
   }
 }
