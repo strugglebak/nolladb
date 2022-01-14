@@ -19,7 +19,7 @@ impl DataType {
       "real" => DataType::Real,
       "none" => DataType::None,
       _ => {
-        eprintln!("Invalid datatype: {}", command)
+        eprintln!("Invalid datatype: {}", command);
         return DataType::Invalid;
       },
     }
