@@ -56,7 +56,7 @@ impl fmt::Display for MetaCommand {
 fn handle_exit_or_quit_meta_command(
   repl_helper: &mut Editor<RealEvalPrintLoopHelper>
 ) -> Result<String> {
-  repl_helper.append_history("history").unwrap();
+  repl_helper.append_history(".history").unwrap();
   std::process::exit(0)
 }
 
