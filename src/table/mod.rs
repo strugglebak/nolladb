@@ -1,4 +1,5 @@
 mod datatype;
+mod index;
 mod row;
 
 use std::collections::{HashMap};
