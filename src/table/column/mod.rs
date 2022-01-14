@@ -30,8 +30,8 @@ impl Column {
     let cd = DataType::new(column_datatype);
     let index = match cd {
       DataType::Integer => Index::Integer(BTreeMap::new()),
-      DataType::Bool => Index::None,
       DataType::Text => Index::Text(BTreeMap::new()),
+      DataType::Bool => Index::None,
       DataType::Real => Index::None,
       DataType::None => Index::None,
       DataType::Invalid => Index::None,

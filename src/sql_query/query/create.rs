@@ -54,9 +54,9 @@ impl CreateQuery {
             DataType::SmallInt(_) => "Integer", // bytes
             DataType::Int(_) => "Integer", // bytes
             DataType::BigInt(_) => "Integer", // bytes
-            DataType::Boolean => "Bool",
             DataType::Text => "Text",
             DataType::Varchar(_) => "Text", // bytes
+            DataType::Boolean => "Bool",
             DataType::Real => "Real",
             DataType::Float(_) => "Real", // precision
             DataType::Double => "Real",
