@@ -168,14 +168,13 @@ impl Table {
       .iter()
       .enumerate() {
       let table_column = self.get_column_mut(table_column_name.to_string()).unwrap();
+      let Column { index, column_name, .. } = &table_column;
 
       // 找到下一个具备唯一性约束的 column 为止
-      if !table_column.is_unique_constraint {
-        continue;
-      }
-
-      let Column { index, column_name, .. } = &table_column;
-      if *table_column_name != *column_name {
+      // 或者
+      // 如果当前插入的 column name 和表中的 column name 不一致也继续找
+      if !table_column.is_unique_constraint ||
+         *table_column_name != *column_name {
         continue;
       }
 
@@ -221,5 +220,13 @@ impl Table {
     }
 
     Ok(())
+  }
+
+  pub fn insert_row(
+    &mut self,
+    table_column_names: &Vec<String>,
+    table_column_value: &Vec<String>,
+  ) {
+
   }
 }

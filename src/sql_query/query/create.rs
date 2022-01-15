@@ -78,25 +78,28 @@ impl CreateQuery {
                 is_primary
               } => {
                 // 只有 Integer 和 Text 类型可以作为 PRIMARY KEY 和 Unique 约束
-                if column_datatype != "Bool" && column_datatype != "Real" {
-                  is_primary_key = is_primary;
-                  is_unique_constraint = true;
-                  if is_primary_key {
-                    // 而只有是 PRIMARY KEY 的情况下，才可以是 NOT NULL 约束
-                    is_not_null_constraint = true;
-
-                    // 这里还要检查创建表时，表里面是否已经有 PRIMARY KEY
-                    if table_metadata_columns
-                        .iter()
-                        .any(|table_metadata_column| table_metadata_column.is_primary_key == true) {
-                      return Err(
-                        NollaDBError::Internal(
-                          format!("Table '{}' has more than one PRIMARY KEY", &name)
-                        )
-                      );
-                    }
-                  }
+                if column_datatype == "Bool" ||
+                   column_datatype == "Real" ||
+                   !is_primary {
+                  continue;
                 }
+
+                // 这里还要检查创建表时，表里面是否已经有 PRIMARY KEY
+                if table_metadata_columns
+                    .iter()
+                    .any(|table_metadata_column| table_metadata_column.is_primary_key == true) {
+                  return Err(
+                    NollaDBError::Internal(
+                      format!("Table '{}' has more than one PRIMARY KEY", &name)
+                    )
+                  );
+                }
+
+                is_primary_key = is_primary;
+                is_unique_constraint = true;
+                // 而只有是 PRIMARY KEY 的情况下，才可以是 NOT NULL 约束
+                is_not_null_constraint = true;
+
               },
               ColumnOption::NotNull => {
                 is_not_null_constraint = true;
