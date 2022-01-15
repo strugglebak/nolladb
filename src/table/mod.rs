@@ -16,6 +16,7 @@ use crate::error::{Result, NollaDBError};
 use row::Row;
 use column::Column;
 use column::data_type::DataType;
+use column::index::Index;
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct Table {
@@ -138,7 +139,7 @@ impl Table {
   pub fn get_column(&mut self, column_name: String) -> Result<&Column> {
     for table_column in self.table_columns.iter() {
       if table_column.column_name == column_name {
-        return Ok(table_column)
+        return Ok(table_column);
       }
     }
 
@@ -149,10 +150,76 @@ impl Table {
     // TODO: 待优化
     for table_column in self.table_columns.iter_mut() {
       if table_column.column_name == column_name {
-        return Ok(table_column)
+        return Ok(table_column);
       }
     }
 
     Err(NollaDBError::General(String::from("Column not found.")))
+  }
+
+  // 检查 InsertQuery 中的唯一性约束
+  pub fn check_unique_constraint(
+    &mut self,
+    table_column_names: &Vec<String>,
+    table_column_value: &Vec<String>,
+  ) -> Result<()> {
+    for (i, table_column_name) in
+      table_column_names
+      .iter()
+      .enumerate() {
+      let table_column = self.get_column_mut(table_column_name.to_string()).unwrap();
+
+      // 找到下一个具备唯一性约束的 column 为止
+      if !table_column.is_unique_constraint {
+        continue;
+      }
+
+      let Column { index, column_name, .. } = &table_column;
+      if *table_column_name != *column_name {
+        continue;
+      }
+
+      let column_value = &table_column_value[i];
+      match index {
+        Index::Integer(tree) => {
+          if tree.contains_key(&column_value.parse::<i64>().unwrap()) {
+            return Err(
+              NollaDBError::General(
+                format!(
+                  "Error: column {} has a unique constraint violation,
+                  value {} already exists for column {}",
+                  *column_name, column_value, *column_name
+                )
+              )
+            );
+          }
+        },
+        Index::Text(tree) => {
+          if tree.contains_key(&column_value.parse::<i64>().unwrap()) {
+            return Err(
+              NollaDBError::General(
+                format!(
+                  "Error: column {} has a unique constraint violation,
+                  value {} already exists for column {}",
+                  *column_name, column_value, *column_name
+                )
+              )
+            );
+          }
+        },
+        Index::None => {
+          return Err(
+            NollaDBError::General(
+              format!(
+                "Error: cannot find index in column {} ",
+                *column_name
+              )
+            )
+          );
+        },
+      };
+    }
+
+    Ok(())
   }
 }
