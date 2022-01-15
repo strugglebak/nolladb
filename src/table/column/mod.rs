@@ -48,7 +48,7 @@ impl Column {
     }
   }
 
-  pub fn get_mut_index(&mut self) -> &mut Index {
+  pub fn get_index_mut(&mut self) -> &mut Index {
     &mut self.index
   }
 }
