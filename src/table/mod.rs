@@ -145,7 +145,7 @@ impl Table {
     Err(NollaDBError::General(String::from("Column not found.")))
   }
 
-  pub fn get_column_mut(&mut self, column_name: String) -> Result<&mut Column> {
+  pub fn get_column_mut<'a>(&mut self, column_name: String) -> Result<&mut Column> {
     // TODO: 待优化
     for table_column in self.table_columns.iter_mut() {
       if table_column.column_name == column_name {
