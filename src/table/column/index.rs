@@ -4,9 +4,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub enum Index {
-  Integer(BTreeMap<i64, i32>),
-  Text(BTreeMap<i64, String>),
-  // Bool(BTreeMap<i64, bool>),
-  // Real(BTreeMap<i64, f32>),
+  Integer(BTreeMap<i32, i64>),
+  Text(BTreeMap<String, i64>),
+  // Bool(BTreeMap<bool, i64>),
+  // Real(BTreeMap<f32, i64>),
   None,
 }

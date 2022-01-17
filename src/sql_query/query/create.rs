@@ -80,9 +80,7 @@ impl CreateQuery {
                 // 只有 Integer 和 Text 类型可以作为 PRIMARY KEY 和 Unique 约束
                 if column_datatype == "Bool" ||
                    column_datatype == "Real" ||
-                   !is_primary {
-                  continue;
-                }
+                   !is_primary { continue; }
 
                 // 这里还要检查创建表时，表里面是否已经有 PRIMARY KEY
                 if table_metadata_columns
