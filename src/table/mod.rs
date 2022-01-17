@@ -6,6 +6,11 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use serde::{Deserialize, Serialize};
+use prettytable::{
+  Table as PrintTable,
+  Row as PrintRow,
+  Cell as PrintCell,
+};
 
 use crate::sql_query::query::create::{
   CreateQuery,
@@ -318,7 +323,6 @@ impl Table {
           .unwrap()
           .get_index_mut();
 
-
       // 更新
       let key = new_row_id.clone();
       match &mut table_key_corresponding_column_data {
@@ -343,10 +347,44 @@ impl Table {
           let value = value.parse::<f32>().unwrap();
           row_tree.insert(key, value);
         },
-        Row::None => panic!("None data Found"),
+        Row::None => panic!("None column data Found"),
       }
     }
-
     self.most_recent_row_id = new_row_id;
+  }
+
+  pub fn print_sql_of_schema(&self) -> Result<usize> {
+    let mut table = PrintTable::new();
+    table.add_row(row![
+      "Column Name",
+      "Column DataType",
+      "IS PRIMARY KEY",
+      "IS UNIQUE",
+      "IS NOT NULL",
+      "IS INDEXED",
+    ]);
+
+    for table_column in &self.table_columns {
+      let Column {
+        column_name,
+        column_datatype,
+        is_primary_key,
+        is_unique_constraint,
+        is_not_null_constraint,
+        is_indexed,
+        ..
+      } = &table_column;
+
+      table.add_row(row![
+        column_name,
+        column_datatype,
+        is_primary_key,
+        is_unique_constraint,
+        is_not_null_constraint,
+        is_indexed,
+      ]);
+    }
+
+    Ok(table.printstd())
   }
 }
