@@ -354,8 +354,8 @@ impl Table {
   }
 
   pub fn print_column_of_schema(&self) -> Result<usize> {
-    let mut table = PrintTable::new();
-    table.add_row(row![
+    let mut print_table = PrintTable::new();
+    print_table.add_row(row![
       "Column Name",
       "Column DataType",
       "IS PRIMARY KEY",
@@ -375,7 +375,7 @@ impl Table {
         ..
       } = &table_column;
 
-      table.add_row(row![
+      print_table.add_row(row![
         column_name,
         column_datatype,
         is_primary_key,
@@ -385,6 +385,70 @@ impl Table {
       ]);
     }
 
-    Ok(table.printstd())
+    Ok(print_table.printstd())
+  }
+
+  pub fn print_table_data(&self) -> Result<usize> {
+    let mut print_table = PrintTable::new();
+
+    let column_names_vec = self
+        .table_columns
+        .iter()
+        .map(|table_column| table_column.column_name.to_string())
+        .collect::<Vec<String>>();
+
+    // column name
+    // 输出为最顶部的 header
+    let print_table_rows_header = PrintRow::new(
+      column_names_vec
+        .iter()
+        .map(|column_name| PrintCell::new(&column_name))
+        .collect::<Vec<PrintCell>>(),
+    );
+
+    let table_rows_clone = Rc::clone(&self.table_rows);
+    let table_rows_data =
+      table_rows_clone
+        .as_ref()
+        .borrow();
+    let table_first_column_data =
+      table_rows_data
+        .get(&self.table_columns.first().unwrap().column_name)
+        .unwrap();
+
+    let number_of_element_in_column
+      = table_first_column_data.get_number_of_element_in_column();
+
+    let mut print_table_rows: Vec<PrintRow>
+      = vec![
+        PrintRow::new(vec![]);
+        number_of_element_in_column
+      ];
+
+    // 拿到每个 column_name 对应下的数据，并进行输出
+    for column_name in &column_names_vec {
+      let table_certain_column_data =
+        table_rows_data
+          .get(column_name)
+          .expect("Can not find any rows with the given column name");
+      let values_of_table_certain_column_data =
+        table_certain_column_data.get_serialized_column_data();
+
+      for i in 0..number_of_element_in_column {
+        let mut cell_instance = "";
+        if let Some(cell) =
+          &values_of_table_certain_column_data.get(i) {
+          cell_instance = cell;
+        }
+        print_table_rows[i].add_cell(PrintCell::new(cell_instance));
+      }
+    }
+
+    print_table.add_row(print_table_rows_header);
+    for row in print_table_rows {
+      print_table.add_row(row);
+    }
+
+    Ok(print_table.printstd())
   }
 }

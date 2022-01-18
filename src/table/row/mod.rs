@@ -16,7 +16,7 @@ pub enum Row {
 // Column 有一个 Index，这个 Index 也是由 BTreeMap 管理
 // 这个 Index 里的 BTreeMap 存的 key/value 跟 Row 里面的 key/value 刚好相反
 impl Row {
-  fn get_number_of_element_in_column(&self) -> usize {
+  pub fn get_number_of_element_in_column(&self) -> usize {
     match self {
       Row::Integer(tree) => tree.len(),
       Row::Bool(tree) => tree.len(),
@@ -26,7 +26,7 @@ impl Row {
     }
   }
 
-  fn get_serialized_column_data(&self) -> Vec<String> {
+  pub fn get_serialized_column_data(&self) -> Vec<String> {
     match self {
       Row::Integer(tree) => tree.iter().map(|(_key, value)| value.to_string()).collect(),
       Row::Bool(tree) => tree.iter().map(|(_key, value)| value.to_string()).collect(),
