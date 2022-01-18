@@ -353,7 +353,7 @@ impl Table {
     self.most_recent_row_id = new_row_id;
   }
 
-  pub fn print_sql_of_schema(&self) -> Result<usize> {
+  pub fn print_column_of_schema(&self) -> Result<usize> {
     let mut table = PrintTable::new();
     table.add_row(row![
       "Column Name",
