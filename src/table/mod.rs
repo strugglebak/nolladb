@@ -148,7 +148,7 @@ impl Table {
       }
     }
 
-    Err(NollaDBError::General(String::from("Column not found.")))
+    Err(NollaDBError::General(String::from("Column not found")))
   }
 
   pub fn get_column_mut(&mut self, column_name: String) -> Result<&mut Column> {
@@ -159,7 +159,7 @@ impl Table {
       }
     }
 
-    Err(NollaDBError::General(String::from("Column not found.")))
+    Err(NollaDBError::General(String::from("Column not found")))
   }
 
   // 检查 InsertQuery 中的唯一性约束
@@ -347,7 +347,7 @@ impl Table {
           let value = value.parse::<f32>().unwrap();
           row_tree.insert(key, value);
         },
-        Row::None => panic!("None column data Found"),
+        Row::None => panic!("None column data found"),
       }
     }
     self.most_recent_row_id = new_row_id;

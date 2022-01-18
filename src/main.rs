@@ -5,6 +5,7 @@ mod meta_command;
 mod sql_query;
 mod read_eval_print_loop;
 mod table;
+mod database;
 
 use rustyline::Editor;
 use rustyline::error::ReadlineError;
@@ -31,14 +32,14 @@ fn main() -> rustyline::Result<()> {
 
   // 加载历史记录
   if repl.load_history(".history").is_err() {
-    println!("No more history.");
+    println!("No more history");
   }
 
   loop {
     let print = format!("nolladb>");
     repl
      .helper_mut()
-     .expect("No helper found.")
+     .expect("No helper found")
      .colored_prompt = format!("\x1b[1;34m{}\x1b[0m", print);
 
     let readline = repl.readline(&print);

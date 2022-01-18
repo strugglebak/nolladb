@@ -108,7 +108,7 @@ impl Validator for RealEvalPrintLoopHelper {
   {
     use ValidationResult::{Incomplete, Valid};
     let input = context.input();
-    let result = if input.starts_with(".") {
+    let result = if input.starts_with("") {
       Valid(None)
     } else if !input.ends_with(";") {
       // 没遇到分号，表示还在输入中
@@ -132,7 +132,7 @@ pub fn get_config() -> Config {
 }
 
 pub fn get_command_type(command: &String) -> CommandType {
-  match command.starts_with(".") {
+  match command.starts_with("") {
     true => CommandType::MetaCommand(MetaCommand::new(command.to_owned())),
     false => CommandType::SQLQuery(SQLQuery::new(command.to_owned())),
   }

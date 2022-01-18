@@ -66,7 +66,7 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
         Ok(create_query) => {
           let table_name = create_query.table_name.clone();
           // TODO: 创建表
-          message = String::from("CREATE TABLE statement done.");
+          message = String::from("CREATE TABLE statement done");
           println!("{}", message.to_string());
         },
         Err(error) => return Err(error),
@@ -74,7 +74,7 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
     },
     Statement::Query(_) => {
       // TODO: 在表中查询
-      message = String::from("SELECT statement done.");
+      message = String::from("SELECT statement done");
       println!("{}", message.to_string());
     },
     Statement::Insert {
@@ -83,7 +83,7 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
       match InsertQuery::new(&statement) {
         Ok(insert_query) => {
           // TODO: 在表中插入
-          message = String::from("INSERT statement done.");
+          message = String::from("INSERT statement done");
           println!("{}", message.to_string());
         },
         Err(error) => return Err(error),
@@ -93,20 +93,20 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
       ..
     } => {
       // TODO: 在表中更新
-      message = String::from("UPDATE statement done.");
+      message = String::from("UPDATE statement done");
       println!("{}", message.to_string());
     },
     Statement::Delete {
       ..
     } => {
       // TODO: 在表中删除
-      message = String::from("UPDATE statement done.");
+      message = String::from("UPDATE statement done");
       println!("{}", message.to_string());
     },
     _ => {
       return Err(
         NollaDBError::ToBeImplemented(
-          "Other SQL statement will to be implemented soon.".to_string()
+          "Other SQL statement will to be implemented soon".to_string()
         )
       );
     },
