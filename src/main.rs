@@ -25,11 +25,13 @@ use database::Database;
 fn main() -> rustyline::Result<()> {
   // 创建 database
   let args: Vec<String> = env::args().collect();
-  if args.len() != 2 {
-    println!("Usage: {} DATABASE_NAME.db", args[0]);
+  // cargo run
+  let args_right_number = 2;
+  if args.len() != args_right_number {
+    println!("Usage: {} DATABASE_NAME.db", "cargo run");
     process::exit(1)
   }
-  let database_name = &args[1];
+  let database_name = &args[args_right_number - 1];
   if !database_name.ends_with(".db") {
     println!("Database name should end with '.db'");
     process::exit(1)
