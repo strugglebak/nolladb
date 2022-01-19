@@ -66,13 +66,10 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
     } => {
       match CreateQuery::new(&statement) {
         Ok(create_query) => {
-          let CreateQuery {
-            table_name,
-            ..
-          } = create_query;
+          let table_name = create_query.table_name.clone();
 
           // 检查表是否已经被创建
-          if database.has_table(table_name) {
+          if database.has_table(table_name.to_string()) {
             return Err(NollaDBError::Internal(
               format!(
                 "Can not create table, because table '{}' already exists",
@@ -83,10 +80,10 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
 
           // 创建表
           let table = Table::new(create_query);
+          // 打印表 schema
+          let _ = table.print_column_of_schema();
           // 把表插入到数据库中
           database.tables.insert(table_name.to_string(), table);
-          // 打印表 schema
-          table.print_column_of_schema();
 
           message = String::from("CREATE TABLE statement done");
         },
@@ -109,7 +106,7 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
           } = insert_query;
 
           // 检查表是否已经被创建
-          if !database.has_table(table_name) {
+          if !database.has_table(table_name.to_string()) {
             return Err(NollaDBError::Internal(
               format!(
                 "Table '{}' does not exist",
@@ -159,7 +156,7 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
           }
 
           // 打印插入完成后的表数据
-          table.print_table_data();
+          let _ = table.print_table_data();
 
           message = String::from("INSERT statement done");
         },
@@ -187,6 +184,5 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
     },
   };
 
-  println!("{}", message.to_string());
   Ok(message)
 }
