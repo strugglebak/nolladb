@@ -6,7 +6,7 @@ use sqlparser::ast::Statement;
 
 use crate::error::{Result, NollaDBError};
 use crate::database::Database;
-use crate::table::{Table, };
+use crate::table::{Table};
 
 use query::create::{CreateQuery};
 use query::insert::{InsertQuery};
