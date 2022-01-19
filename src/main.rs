@@ -7,6 +7,8 @@ mod read_eval_print_loop;
 mod table;
 mod database;
 
+use std::{env, process};
+
 use rustyline::Editor;
 use rustyline::error::ReadlineError;
 
@@ -18,8 +20,22 @@ use read_eval_print_loop::{
   get_config,
   get_command_type,
 };
+use database::Database;
 
 fn main() -> rustyline::Result<()> {
+  // 创建 database
+  let args: Vec<String> = env::args().collect();
+  if args.len() != 2 {
+    println!("Usage: {} DATABASE_NAME.db", args[0]);
+    process::exit(1)
+  }
+  let database_name = &args[1];
+  if !database_name.ends_with(".db") {
+    println!("Database name should end with '.db'");
+    process::exit(1)
+  }
+  let mut database = Database::new(database_name.to_string());
+
   // 创建 repl helper
   let repl_helper = RealEvalPrintLoopHelper::default();
 
@@ -30,8 +46,10 @@ fn main() -> rustyline::Result<()> {
   let mut repl = Editor::with_config(repl_config);
   repl.set_helper(Some(repl_helper));
 
+  let history_file = ".history";
+
   // 加载历史记录
-  if repl.load_history(".history").is_err() {
+  if repl.load_history(history_file).is_err() {
     println!("No more history");
   }
 
@@ -55,7 +73,7 @@ fn main() -> rustyline::Result<()> {
             }
           },
           CommandType::SQLQuery(_) => {
-            match handle_sql_query(&command) {
+            match handle_sql_query(&command, &mut database) {
               Ok(response) => println!("{}", response),
               Err(error) => eprintln!("An error occurred: {:?}", error),
             }
@@ -71,7 +89,7 @@ fn main() -> rustyline::Result<()> {
     }
   }
 
-  repl.append_history(".history").unwrap();
+  repl.append_history(history_file).unwrap();
 
   Ok(())
 }
