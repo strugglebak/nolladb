@@ -5,6 +5,8 @@ use sqlparser::dialect::SQLiteDialect;
 use sqlparser::ast::Statement;
 
 use crate::error::{Result, NollaDBError};
+use crate::database::Database;
+use crate::table::{Table, };
 
 use query::create::{CreateQuery};
 use query::insert::{InsertQuery};
@@ -34,7 +36,7 @@ impl SQLQuery {
   }
 }
 
-pub fn handle_sql_query(sql_query: &str) -> Result<String> {
+pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<String> {
   let dialect = SQLiteDialect {};
   let mut ast =
     Parser::parse_sql(&dialect, &sql_query)
@@ -65,9 +67,25 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
       match CreateQuery::new(&statement) {
         Ok(create_query) => {
           let table_name = create_query.table_name.clone();
-          // TODO: 创建表
+
+          // 检查表是否已经被创建
+          if database.has_table(table_name) {
+            return Err(NollaDBError::Internal(
+              format!(
+                "Can not create table, because table '{}' already exists",
+                table_name
+              )
+            ));
+          }
+
+          // 创建表
+          let table = Table::new(create_query);
+          // 把表插入到数据库中
+          database.tables.insert(table_name.to_string(), table);
+          // 打印表 schema
+          table.print_column_of_schema();
+
           message = String::from("CREATE TABLE statement done");
-          println!("{}", message.to_string());
         },
         Err(error) => return Err(error),
       }
@@ -75,7 +93,6 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
     Statement::Query(_) => {
       // TODO: 在表中查询
       message = String::from("SELECT statement done");
-      println!("{}", message.to_string());
     },
     Statement::Insert {
       ..
@@ -84,7 +101,6 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
         Ok(insert_query) => {
           // TODO: 在表中插入
           message = String::from("INSERT statement done");
-          println!("{}", message.to_string());
         },
         Err(error) => return Err(error),
       }
@@ -94,14 +110,12 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
     } => {
       // TODO: 在表中更新
       message = String::from("UPDATE statement done");
-      println!("{}", message.to_string());
     },
     Statement::Delete {
       ..
     } => {
       // TODO: 在表中删除
       message = String::from("UPDATE statement done");
-      println!("{}", message.to_string());
     },
     _ => {
       return Err(
@@ -112,5 +126,6 @@ pub fn handle_sql_query(sql_query: &str) -> Result<String> {
     },
   };
 
+  println!("{}", message.to_string());
   Ok(message)
 }
