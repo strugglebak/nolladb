@@ -24,6 +24,9 @@ pub enum SQLQuery {
 impl SQLQuery {
   pub fn new(command: String) -> SQLQuery {
     let args: Vec<&str> = command.split_whitespace().collect();
+    if args.len() == 0 {
+      return SQLQuery::Unknown(command);
+    }
     let first_cmd = args[0].to_owned();
     match first_cmd.as_ref() {
       "create" => SQLQuery::CreateTable(command),

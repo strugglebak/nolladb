@@ -19,6 +19,9 @@ pub enum MetaCommand {
 impl MetaCommand {
   pub fn new(command: String) -> MetaCommand {
     let args: Vec<&str> = command.split_whitespace().collect();
+    if args.len() == 0 {
+      return MetaCommand::Unknown;
+    }
     // to_owned 将 &str 转变成 String
     let first_cmd = args[0].to_owned();
     // as_ref 将 String 转变成 &str
