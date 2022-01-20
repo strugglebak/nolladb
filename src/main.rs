@@ -65,6 +65,8 @@ fn main() -> rustyline::Result<()> {
     let readline = repl.readline(&print);
     match readline {
       Ok(command) => {
+        if command.len() == 0 { continue; }
+
         repl.add_history_entry(command.as_str());
         let command_type = get_command_type(&command.trim().to_owned());
         match command_type {
