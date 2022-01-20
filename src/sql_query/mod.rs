@@ -9,6 +9,7 @@ use crate::database::Database;
 use crate::table::{Table};
 
 use query::create::{CreateQuery};
+use query::select::{SelectQuery};
 use query::insert::{InsertQuery};
 
 #[derive(Debug, PartialEq)]
@@ -28,7 +29,7 @@ impl SQLQuery {
       return SQLQuery::Unknown(command);
     }
     let first_cmd = args[0].to_owned();
-    match first_cmd.as_ref() {
+    match first_cmd.to_lowercase().as_ref() {
       "create" => SQLQuery::CreateTable(command),
       "select" => SQLQuery::Select(command),
       "insert" => SQLQuery::Insert(command),
@@ -94,8 +95,12 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
       }
     },
     Statement::Query(_) => {
-      // TODO: 在表中查询
-      message = String::from("SELECT statement done");
+      match SelectQuery::new(&statement) {
+        Ok(select_query) => {
+          message = String::from("SELECT statement done");
+        },
+        Err(error) => return Err(error),
+      }
     },
     Statement::Insert {
       ..

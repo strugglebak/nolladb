@@ -132,7 +132,7 @@ pub fn get_config() -> Config {
 }
 
 pub fn get_command_type(command: &String) -> CommandType {
-  match command.starts_with("") {
+  match command.starts_with(".") {
     true => CommandType::MetaCommand(MetaCommand::new(command.to_owned())),
     false => CommandType::SQLQuery(SQLQuery::new(command.to_owned())),
   }
