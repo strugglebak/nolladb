@@ -85,9 +85,6 @@ impl SelectQuery {
               let selection = &select.selection;
               if let Some(binary_op) = selection {
                 if let Expr::BinaryOp { left, op, right } = binary_op {
-                  println!("{:#?}", left);
-                  println!("{:#?}", op);
-                  println!("{:#?}", right);
                   if let Expr::Identifier(ident) = &**left {
                     select_table_condition.left = ident.value.to_string();
                   }
