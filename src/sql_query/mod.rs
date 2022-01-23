@@ -46,8 +46,16 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
     Parser::parse_sql(&dialect, &sql_query)
       .map_err(NollaDBError::from)?;
 
-  // 目前仅支持单个 SQL 语句输入
-  if ast.len() > 1 {
+  if ast.len() == 0 {
+    return Err(
+      NollaDBError::SQLParseError(
+        ParserError::ParserError(
+          format!("Expected a correct SQL query statement")
+        )
+      )
+    );
+  } else if ast.len() > 1 {
+    // 目前仅支持单个 SQL 语句输入
     return Err(
       NollaDBError::SQLParseError(
         ParserError::ParserError(
