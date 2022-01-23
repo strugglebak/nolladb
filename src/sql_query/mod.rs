@@ -97,6 +97,7 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
     Statement::Query(_) => {
       match SelectQuery::new(&statement) {
         Ok(select_query) => {
+          println!("{:#?}", select_query);
           message = String::from("SELECT statement done");
         },
         Err(error) => return Err(error),

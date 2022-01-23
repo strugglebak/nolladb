@@ -12,17 +12,17 @@ use crate::error::{Result, NollaDBError};
 
 #[derive(Debug)]
 struct BinaryOp {
-  left: String,
+  left_name: String,
   op: BinaryOperator,
-  right: String,
+  right_name: String,
 }
 
 impl BinaryOp {
   pub fn new() -> Self {
     Self {
-      left: "".to_string(),
+      left_name: "".to_string(),
       op: BinaryOperator::Eq,
-      right: "".to_string(),
+      right_name: "".to_string(),
     }
   }
 }
@@ -86,13 +86,13 @@ impl SelectQuery {
               if let Some(binary_op) = selection {
                 if let Expr::BinaryOp { left, op, right } = binary_op {
                   if let Expr::Identifier(ident) = &**left {
-                    select_table_condition.left = ident.value.to_string();
+                    select_table_condition.left_name = ident.value.to_string();
                   }
 
                   select_table_condition.op = op.clone();
 
                   if let Expr::Identifier(ident) = &**right {
-                    select_table_condition.right = ident.value.to_string();
+                    select_table_condition.right_name = ident.value.to_string();
                   }
                 }
               }
