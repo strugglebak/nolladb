@@ -7,6 +7,7 @@ use sqlparser::ast::{
   TableFactor,
   ObjectName,
   BinaryOperator,
+  Value,
 };
 use crate::error::{Result, NollaDBError};
 
@@ -52,23 +53,41 @@ impl SelectQuery {
             ..
           } => {
             // 解析类似于
-            // SELECT x FROM t1 WHERE a = b
+            // SELECT x,y FROM t1,t2 WHERE a = b
             // 的语句
             if let SetExpr::Select(select) = body {
-              // println!("{:#?}", select);
+              println!("{:#?}", select);
               // 构建 select_column_names
-              // 拿到 x
+              // 拿到 x,y
               let projection = &select.projection;
               for select_item in projection {
-                if let SelectItem::UnnamedExpr(expr) = select_item {
-                  if let Expr::Identifier(ident) = expr {
-                    select_column_names.push(ident.value.to_string());
+                match select_item {
+                  SelectItem::UnnamedExpr(expr) => {
+                    match expr {
+                      Expr::Identifier(ident) => {
+                        select_column_names.push(ident.value.to_string());
+                      },
+                      Expr::Value(value) => {
+                        match value {
+                          Value::SingleQuotedString(sqs) => {
+                            select_column_names.push(sqs.to_string());
+                          },
+                          _ => (),
+                        }
+                      },
+                      _ => (),
+                    }
+                  },
+                  SelectItem::Wildcard => {
+                    // * 通配符
+                    select_column_names.push("*".to_string());
                   }
+                  _ => (),
                 }
               }
 
               // 构建 select_table_names
-              // 拿到 t1
+              // 拿到 t1,t2
               let from = &select.from;
               for table_with_joins in from {
                 let relation = &table_with_joins.relation;
