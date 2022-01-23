@@ -56,7 +56,7 @@ impl SelectQuery {
             // SELECT x,y FROM t1,t2 WHERE a = b
             // 的语句
             if let SetExpr::Select(select) = body {
-              println!("{:#?}", select);
+              // println!("{:#?}", select);
               // 构建 select_column_names
               // 拿到 x,y
               let projection = &select.projection;
