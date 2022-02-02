@@ -96,3 +96,74 @@ pub fn handle_meta_command(
     ))),
   }
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+  use std::result::Result;
+  use rstest::rstest;
+  use pretty_assertions::assert_eq;
+  use crate::read_eval_print_loop::{get_config, RealEvalPrintLoopHelper};
+
+  #[rstest]
+  #[case(MetaCommand::Help)]
+  fn test_help_meta_command(#[case] input: MetaCommand) {
+    let mut repl = init_repl().unwrap();
+    let result = handle_meta_command(input, &mut repl);
+
+    assert_eq!(result.is_ok(), true);
+  }
+
+  #[rstest]
+  #[case(".open test.db")]
+  fn test_open_meta_command(#[case] command: &str) {
+    let mut repl = init_repl().unwrap();
+    let input = MetaCommand::Open(command.to_string());
+    let result = handle_meta_command(input, &mut repl);
+
+    assert_eq!(result.is_ok(), true);
+  }
+
+  #[rstest]
+  #[case(MetaCommand::Unknown)]
+  fn test_unknown_meta_command(#[case] input: MetaCommand) {
+    let mut repl = init_repl().unwrap();
+    let result = handle_meta_command(input, &mut repl);
+
+    assert_eq!(result.is_err(), true);
+  }
+
+  #[rstest]
+  #[case(MetaCommand::Exit, ".exit")]
+  #[case(MetaCommand::Quit, ".quit")]
+  #[case(MetaCommand::Help, ".help")]
+  #[case(MetaCommand::Tables, ".tables")]
+  #[case(MetaCommand::Unknown, "Unknown command")]
+  fn test_display_meta_command_1(
+    #[case] input: MetaCommand,
+    #[case] expected: &str,
+  ) {
+    assert_eq!(format!("{}", input), expected.to_string());
+  }
+
+  #[rstest]
+  #[case(MetaCommand::Open(".open test.db".to_string()), ".open")]
+  #[case(MetaCommand::Read(".read test.db".to_string()), ".read")]
+  #[case(MetaCommand::Save(".save test.db".to_string()), ".save")]
+  #[case(MetaCommand::Ast(".ast SELECT * from test;".to_string()), ".ast")]
+  fn test_display_meta_command_2(
+    #[case] input: MetaCommand,
+    #[case] expected: &str,
+  ) {
+    assert_eq!(format!("{}", input), expected.to_string());
+  }
+
+  fn init_repl() -> Result<Editor<RealEvalPrintLoopHelper>, ()> {
+    let repl_helper = RealEvalPrintLoopHelper::default();
+    let repl_config = get_config();
+    let mut repl = Editor::with_config(repl_config);
+    repl.set_helper(Some(repl_helper));
+
+    Ok(repl)
+  }
+}
