@@ -16,6 +16,9 @@ use crate::sql_query::query::create::{
   CreateQuery,
   SchemaOfSQLColumn,
 };
+use crate::sql_query::query::select::{
+  SelectQuery,
+};
 use crate::error::{Result, NollaDBError};
 
 use row::Row;
@@ -220,6 +223,11 @@ impl Table {
     }
 
     Ok(())
+  }
+
+  pub fn select(
+    select_query: SelectQuery,
+  ) {
   }
 
   pub fn insert_row(
