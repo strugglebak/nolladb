@@ -134,3 +134,44 @@ impl CreateQuery {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use rstest::rstest;
+  use pretty_assertions::{assert_eq};
+  use sqlparser::parser::Parser;
+  use sqlparser::dialect::SQLiteDialect;
+  use sqlparser::ast::Statement;
+
+  #[rstest]
+  #[case(
+    "CREATE TABLE test (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULl,
+      email TEXT NOT NULL UNIQUE,
+    );",
+    "test",
+  )]
+  fn test_create_table(
+    #[case] query: &str,
+    #[case] expected: &str,
+  ) {
+    let dialect = SQLiteDialect {};
+    let mut ast = Parser::parse_sql(&dialect, &query).unwrap();
+    let statement = ast.pop().unwrap();
+
+    let _ = match statement {
+      Statement::CreateTable {..} => {
+        match CreateQuery::new(&statement) {
+          Ok(create_query) => assert_eq!(create_query.table_name, expected),
+          Err(error) => {
+            eprintln!("Error: {}", error);
+            assert!(false)
+          },
+        }
+      },
+      _ => (),
+    };
+  }
+}
