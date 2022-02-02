@@ -196,3 +196,86 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
 
   Ok(message)
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use std::result::Result;
+  use rstest::rstest;
+  use pretty_assertions::{assert_eq};
+
+  #[rstest]
+  #[case("SELECT * FROM test;", "SELECT statement done")]
+  fn test_handle_select_sql(
+    #[case] input: &str,
+    #[case] expected: &str,
+  ) {
+    let mut database = Database::new("testdb".to_string());
+    let _ = match handle_sql_query(input, &mut database) {
+      Ok(response) => assert_eq!(response, expected),
+      Err(error) => {
+        eprintln!("Error: {}", error);
+        assert!(false)
+      }
+    };
+  }
+
+  #[rstest]
+  #[case(
+    "testdb",
+    "CREATE TABLE test (
+      id INTEGER PRIMARY KEY,
+      name TEXT
+    );",
+    "INSERT INTO test (name) Values ('xxx');",
+    "INSERT statement done",
+  )]
+  #[case(
+    "testdb",
+    "CREATE TABLE test (
+      name TEXT
+    );",
+    "INSERT INTO test (name) Values ('xxx');",
+    "INSERT statement done",
+  )]
+  fn test_handle_insert_sql(
+    #[case] database_name: &str,
+    #[case] query: &str,
+    #[case] insert_query: &str,
+    #[case] expected: &str,
+  ) {
+    let _ = match
+      insert_table_into_database_and_insert_data_into_table(
+        database_name,
+        query,
+        insert_query,
+      ) {
+        Ok(response) => assert_eq!(response, expected),
+        Err(error) => {
+          eprintln!("Error: {}", error);
+          assert!(false)
+        },
+    };
+  }
+
+  fn insert_table_into_database_and_insert_data_into_table(
+    database_name: &str,
+    query: &str,
+    insert_query: &str,
+  ) -> Result<String, NollaDBError> {
+    let mut database= Database::new(database_name.to_string());
+    let dialect = SQLiteDialect {};
+    let mut ast = Parser::parse_sql(&dialect, &query).unwrap();
+    let create_query = CreateQuery::new(&ast.pop().unwrap()).unwrap();
+
+    database.tables.insert(
+      create_query.table_name.to_string(),
+      Table::new(create_query),
+    );
+
+    match handle_sql_query(&insert_query, &mut database) {
+      Ok(response) => Ok(response),
+      Err(error) => Err(error),
+    }
+  }
+}

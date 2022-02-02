@@ -82,21 +82,21 @@ impl Table {
           .borrow_mut()
           .insert(
             column_name.to_string(),
-            Row::Integer(BTreeMap::new())
+            Row::Text(BTreeMap::new())
           ),
         DataType::Bool => table_rows
           .clone()
           .borrow_mut()
           .insert(
             column_name.to_string(),
-            Row::Integer(BTreeMap::new())
+            Row::Bool(BTreeMap::new())
           ),
         DataType::Real => table_rows
           .clone()
           .borrow_mut()
           .insert(
             column_name.to_string(),
-            Row::Integer(BTreeMap::new())
+            Row::Real(BTreeMap::new())
           ),
         DataType::None => table_rows
           .clone()
@@ -224,7 +224,7 @@ impl Table {
 
   pub fn insert_row(
     &mut self,
-   table_column_names: &Vec<String>,
+    table_column_names: &Vec<String>,
     table_column_value: &Vec<String>,
   ) {
     let mut new_row_id = self.most_recent_row_id + i64::from(1);
@@ -234,48 +234,56 @@ impl Table {
       table_rows_clone
         .as_ref()
         .borrow_mut();
-    let mut table_certain_column_data =
-      table_rows_data
-        .get_mut(&self.primary_key)
-        .unwrap();
 
-    match self.primary_key == "-1" {
-      // 没设置 PRIMARY KEY
-      true => {
-        if let Row::Integer(_) = &mut table_certain_column_data {
-          for (i, table_column_name) in table_column_names.iter().enumerate() {
-            if table_column_name != &self.primary_key { continue; }
-            let value = &table_column_value[i];
-            new_row_id = value.parse::<i64>().unwrap();
-          }
-        }
-      },
-      // 设置了 PRIMARY KEY
-      false => {
-        if !table_column_names
-          .iter()
-          .any(|table_column_name| table_column_name == &self.primary_key) {
+    if self.primary_key != "-1" {
 
-          if let Row::Integer(row_tree) = &mut table_certain_column_data {
-            let key = new_row_id.clone();
-            let value = new_row_id as i32;
+      // 定义了某一列的名字为 PRIMARY KEY
+      let mut table_certain_column_data =
+        table_rows_data
+          .get_mut(&self.primary_key)
+          .unwrap();
 
-            row_tree.insert(key, value);
+      match
+       table_column_names
+        .iter()
+        .any(|table_column_name| table_column_name == &self.primary_key) {
+          // 如果要 INSERT 的列的列名包含 PRIMARY KEY
+          // 就只更新 row id
+          true => {
 
-            let table_certain_column_index =
-              self
-                .get_column_mut(self.primary_key.to_string())
-                .unwrap()
-                .get_index_mut();
-            if let Index::Integer(column_tree) = table_certain_column_index {
-              column_tree.insert(value, key);
+            if let Row::Integer(_) = &mut table_certain_column_data {
+              for (i, table_column_name) in table_column_names.iter().enumerate() {
+                // 循环并找到这一列
+                if table_column_name != &self.primary_key { continue; }
+                let value = &table_column_value[i];
+                // 更新 row id
+                new_row_id = value.parse::<i64>().unwrap();
+              }
             }
 
-          }
+          },
+          // 如果要 INSERT 的列的列名不包含 PRIMARY KEY
+          // 直接插入这一列的数据，不用更新 row id
+          false => {
 
-        }
+            if let Row::Integer(row_tree) = &mut table_certain_column_data {
+              let key = new_row_id.clone();
+              let value = new_row_id as i32;
 
-      },
+              row_tree.insert(key, value);
+
+              let table_certain_column_index =
+                self
+                  .get_column_mut(self.primary_key.to_string())
+                  .unwrap()
+                  .get_index_mut();
+              if let Index::Integer(column_tree) = table_certain_column_index {
+                column_tree.insert(value, key);
+              }
+            }
+
+          },
+      }
     }
 
     // 检查 INSERT statement 中是否有表中没有的 column
