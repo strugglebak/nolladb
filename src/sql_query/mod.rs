@@ -9,7 +9,6 @@ use crate::database::Database;
 use crate::table::{Table};
 
 use query::create::{CreateQuery};
-use query::select::{SelectQuery};
 use query::insert::{InsertQuery};
 
 #[derive(Debug, PartialEq)]
@@ -103,13 +102,7 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
       }
     },
     Statement::Query(_) => {
-      match SelectQuery::new(&statement) {
-        Ok(select_query) => {
-          println!("{:#?}", select_query);
-          message = String::from("SELECT statement done");
-        },
-        Err(error) => return Err(error),
-      }
+      message = String::from("SELECT statement done");
     },
     Statement::Insert {
       ..
