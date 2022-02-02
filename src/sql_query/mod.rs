@@ -265,7 +265,7 @@ mod tests {
     query: &str,
     insert_query: &str,
   ) -> Result<String, NollaDBError> {
-    let mut database= Database::new(database_name.to_string());
+    let mut database = Database::new(database_name.to_string());
     let dialect = SQLiteDialect {};
     let mut ast = Parser::parse_sql(&dialect, &query).unwrap();
     let create_query = CreateQuery::new(&ast.pop().unwrap()).unwrap();

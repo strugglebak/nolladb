@@ -37,3 +37,92 @@ impl Database {
     }
   }
 }
+
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use std::result::Result;
+  use rstest::rstest;
+  use pretty_assertions::{assert_eq};
+  use sqlparser::parser::Parser;
+  use sqlparser::dialect::SQLiteDialect;
+  use crate::sql_query::query::create::{CreateQuery};
+
+  #[rstest]
+  #[case("testdb")]
+  fn test_create_new_database(
+    #[case] database_name: &str,
+  ) {
+    assert_eq!(Database::new(database_name.to_string()).database_name, database_name);
+  }
+
+  #[rstest]
+  #[case(
+    "testdb",
+    "CREATE TABLE test (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULl,
+      email TEXT NOT NULL UNIQUE,
+      active BOOL,
+      score REAL
+    );",
+    "test"
+  )]
+  fn test_has_table(
+    #[case] database_name: &str,
+    #[case] query: &str,
+    #[case] table_name: &str,
+  ) {
+    let database = create_new_database(database_name, query).unwrap();
+    assert_eq!(database.has_table(table_name.to_string()), true);
+  }
+
+  #[rstest]
+  #[case(
+    "testdb",
+    "CREATE TABLE test (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULl,
+      email TEXT NOT NULL UNIQUE,
+      active BOOL,
+      score REAL
+    );",
+    "test",
+    5,
+    1,
+  )]
+  fn test_get_table(
+    #[case] database_name: &str,
+    #[case] query: &str,
+    #[case] table_name: &str,
+    #[case] expected_table_columns_len: usize,
+    #[case] expected_most_recent_row_id: i64,
+  ) {
+    let database = create_new_database(database_name, query).unwrap();
+    let mut database_mut = create_new_database(database_name, query).unwrap();
+
+    let table = database.get_table(table_name.to_string()).unwrap();
+    let mut table_mut = database_mut.get_table_mut(table_name.to_string()).unwrap();
+
+    table_mut.most_recent_row_id += 1;
+
+    assert_eq!(table.table_columns.len(), expected_table_columns_len);
+    assert_eq!(table_mut.table_columns.len(), expected_table_columns_len);
+    assert_eq!(table_mut.most_recent_row_id, expected_most_recent_row_id);
+  }
+
+  fn create_new_database(database_name: &str, query: &str) -> Result<Database, ()> {
+    let mut database = Database::new(database_name.to_string());
+    let dialect = SQLiteDialect {};
+    let mut ast = Parser::parse_sql(&dialect, &query).unwrap();
+    let create_query = CreateQuery::new(&ast.pop().unwrap()).unwrap();
+
+    database.tables.insert(
+      create_query.table_name.to_string(),
+      Table::new(create_query),
+    );
+
+    Ok(database)
+  }
+}
