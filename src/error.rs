@@ -31,7 +31,7 @@ mod tests {
 
   #[rstest]
   #[case("test error")]
-  fn nolladb_error_test(#[case] input: &str) {
+  fn test_nolladb_error(#[case] input: &str) {
     let expected = NollaDBError::General(input.to_string());
     let result = nolladb_error(&input);
 
@@ -40,7 +40,7 @@ mod tests {
 
   #[rstest]
   #[case("General error")]
-  fn nolladb_general_error_test(#[case] input: &str) {
+  fn test_nolladb_general_error(#[case] input: &str) {
       let expected = format!("General error: {}", input);
       let result = format!("{}", NollaDBError::General(input.to_string()));
 
@@ -49,7 +49,7 @@ mod tests {
 
   #[rstest]
   #[case("Internal error")]
-  fn nolladb_internal_error_test(#[case] input: &str) {
+  fn test_nolladb_internal_error(#[case] input: &str) {
       let expected = format!("Internal error: {}", input);
       let result = format!("{}", NollaDBError::Internal(input.to_string()));
 
@@ -58,7 +58,7 @@ mod tests {
 
   #[rstest]
   #[case("Unknown command error")]
-  fn nolladb_unknown_command_error_test(#[case] input: &str) {
+  fn test_nolladb_unknown_command_error(#[case] input: &str) {
       let expected = format!("Unknown command error: {}", input);
       let result = format!("{}", NollaDBError::UnknownCommand(input.to_string()));
 
@@ -67,7 +67,7 @@ mod tests {
 
   #[rstest]
   #[case("SQL parse error")]
-  fn nolladb_sql_parse_error_test(#[case] input: &str) {
+  fn test_nolladb_sql_parse_error(#[case] input: &str) {
       let expected = format!("SQL Parse error: ParserError(\"{}\")", input);
       let result = format!("{}", NollaDBError::SQLParseError(ParserError::ParserError(input.to_string())));
 
@@ -76,7 +76,7 @@ mod tests {
 
   #[rstest]
   #[case("To be implemented")]
-  fn nolladb_to_be_implemented_error_test(#[case] input: &str) {
+  fn test_nolladb_to_be_implemented_error(#[case] input: &str) {
       let expected = format!("To be Implemented error: {}", input);
       let result = format!("{}", NollaDBError::ToBeImplemented(input.to_string()));
 
