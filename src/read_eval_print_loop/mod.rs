@@ -137,3 +137,21 @@ pub fn get_command_type(command: &String) -> CommandType {
     false => CommandType::SQLQuery(SQLQuery::new(command.to_owned())),
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use rstest::rstest;
+  use pretty_assertions::assert_eq;
+
+  #[rstest]
+  #[case(".help", CommandType::MetaCommand(MetaCommand::Help))]
+  #[case("SELECT * FROM test;", CommandType::SQLQuery(SQLQuery::Select("SELECT * FROM test;".to_string())))]
+  fn test_get_command_type(
+    #[case] input: &str,
+    #[case] expected: CommandType,
+  ) {
+    let result = get_command_type(&input.to_string());
+    assert_eq!(result, expected);
+  }
+}
