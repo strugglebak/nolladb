@@ -460,3 +460,92 @@ impl Table {
     Ok(print_table.printstd())
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use std::result::Result;
+  use rstest::rstest;
+  use pretty_assertions::{assert_eq};
+  use sqlparser::parser::Parser;
+  use sqlparser::dialect::SQLiteDialect;
+
+  #[rstest]
+  #[case(DataType::Integer, "Integer")]
+  #[case(DataType::Text, "Text")]
+  #[case(DataType::Real, "Real")]
+  #[case(DataType::Bool, "Boolean")]
+  #[case(DataType::None, "None")]
+  #[case(DataType::Invalid, "Invalid")]
+  fn test_display_datatype(
+    #[case] data_type: DataType,
+    #[case] expected: &str,
+  ) {
+    assert_eq!(format!("{}", data_type), expected);
+  }
+
+
+  #[rstest]
+  #[case(
+    "CREATE TABLE test (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULl,
+      email TEXT NOT NULL UNIQUE,
+      active BOOL,
+      score REAL
+    );",
+    5,
+    0,
+    true,
+    DataType::Integer,
+  )]
+  fn test_create_new_table(
+    #[case] query: &str,
+    #[case] expected_table_columns_len: usize,
+    #[case] expected_most_recent_row_id: i64,
+    #[case] expected_is_primary_key: bool,
+    #[case] expected_data_type: DataType,
+  ) {
+    let table = create_new_table(query).unwrap();
+
+    if let Some(table_column) =
+      table.table_columns
+        .iter()
+        .filter(|tc| tc.column_name == "id".to_string())
+        .collect::<Vec<&Column>>()
+        .first() {
+      assert_eq!(table.table_columns.len(), expected_table_columns_len);
+      assert_eq!(table.most_recent_row_id, expected_most_recent_row_id);
+      assert_eq!(table_column.is_primary_key, expected_is_primary_key);
+      assert_eq!(table_column.column_datatype, expected_data_type);
+    };
+  }
+
+  #[rstest]
+  #[case(
+    "CREATE TABLE test (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULl,
+      email TEXT NOT NULL UNIQUE,
+      active BOOL,
+      score REAL
+    );",
+    13,
+  )]
+  fn test_print_table_schema(
+    #[case] query: &str,
+    #[case] print_lines_number: usize
+  ) {
+    let table = create_new_table(query).unwrap();
+    assert_eq!(table.print_column_of_schema(), Ok(print_lines_number));
+  }
+
+  fn create_new_table(query: &str) -> Result<Table, ()> {
+    let dialect = SQLiteDialect {};
+    let mut ast = Parser::parse_sql(&dialect, &query).unwrap();
+    let create_query = CreateQuery::new(&ast.pop().unwrap()).unwrap();
+    let table = Table::new(create_query);
+
+    Ok(table)
+  }
+}
