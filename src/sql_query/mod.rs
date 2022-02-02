@@ -183,7 +183,7 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
       ..
     } => {
       // TODO: 在表中删除
-      message = String::from("UPDATE statement done");
+      message = String::from("DELETE statement done");
     },
     _ => {
       return Err(
@@ -206,7 +206,9 @@ mod tests {
 
   #[rstest]
   #[case("SELECT * FROM test;", "SELECT statement done")]
-  fn test_handle_select_sql(
+  #[case("DELETE FROM test WHERE id=1;", "DELETE statement done")]
+  #[case("UPDATE test SET name='xxx' WHERE id=1;", "UPDATE statement done")]
+  fn test_handle_query_statement_sql(
     #[case] input: &str,
     #[case] expected: &str,
   ) {
