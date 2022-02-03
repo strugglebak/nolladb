@@ -1,4 +1,6 @@
+
 #[macro_use] extern crate prettytable;
+#[macro_use] extern crate log;
 
 mod error;
 mod meta_command;
@@ -11,6 +13,7 @@ use std::{env, process};
 
 use rustyline::Editor;
 use rustyline::error::ReadlineError;
+use env_logger::Env;
 
 use meta_command::handle_meta_command;
 use sql_query::handle_sql_query;
@@ -23,6 +26,12 @@ use read_eval_print_loop::{
 use database::Database;
 
 fn main() -> rustyline::Result<()> {
+
+  let env = Env::default()
+        .filter_or("MY_LOG_LEVEL", "info")
+        .write_style_or("MY_LOG_STYLE", "auto");
+  env_logger::init_from_env(env);
+
   // 创建 database
   let args: Vec<String> = env::args().collect();
   // cargo run
