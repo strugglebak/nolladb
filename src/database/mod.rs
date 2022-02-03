@@ -19,6 +19,22 @@ impl Database {
     }
   }
 
+  // TODO:
+  // pub fn open(database_name: String) -> Self {
+  // }
+
+  // TODO:
+  // pub fn read(database_name: String) -> Self {
+  // }
+
+  // TODO:
+  // pub fn save(database_name: String) -> Self {
+  // }
+
+  // TODO:
+  // pub fn get_all_tables() -> Self {
+  // }
+
   pub fn has_table(&self, table_name: String) -> bool {
     self.tables.contains_key(&table_name)
   }

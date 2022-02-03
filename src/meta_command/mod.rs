@@ -2,6 +2,7 @@ use std::fmt;
 use rustyline::Editor;
 use crate::error::{Result, NollaDBError};
 use crate::read_eval_print_loop::{RealEvalPrintLoopHelper};
+use crate::sql_query::get_sql_ast;
 
 #[derive(Debug, PartialEq)]
 pub enum MetaCommand {
@@ -90,7 +91,10 @@ pub fn handle_meta_command(
     MetaCommand::Open(args) => Ok(format!("To be implemented: {}", args)),
     MetaCommand::Read(args) => Ok(format!("To be implemented: {}", args)),
     MetaCommand::Save(args) => Ok(format!("To be implemented: {}", args)),
-    MetaCommand::Ast(args) => Ok(format!("To be implemented: {}", args)),
+    MetaCommand::Ast(args) => {
+      println!("{:#?}", get_sql_ast(&args.to_string()).unwrap());
+      Ok(args)
+    },
     MetaCommand::Unknown => Err(NollaDBError::UnknownCommand(format!(
       "Unknown command or invalid arguments. Enter '.help'"
     ))),

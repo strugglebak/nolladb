@@ -39,7 +39,7 @@ impl SQLQuery {
   }
 }
 
-pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<String> {
+pub fn get_sql_ast(sql_query: &str) -> Result<Statement> {
   let dialect = SQLiteDialect {};
   let mut ast =
     Parser::parse_sql(&dialect, &sql_query)
@@ -69,8 +69,12 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
     );
   }
 
+  Ok(ast.pop().unwrap())
+}
+
+pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<String> {
+  let statement = get_sql_ast(sql_query).unwrap();
   let message: String;
-  let statement = ast.pop().unwrap();
   match statement {
     Statement::CreateTable {
       ..
