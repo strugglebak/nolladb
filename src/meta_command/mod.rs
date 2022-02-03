@@ -79,7 +79,7 @@ pub fn handle_meta_command(
       "Special commands:\n",
       ".help            - Display help message\n",
       "---------------------------------------\n",
-      ".ast  <QUERY>    - Show the abstract syntax tree for QUERY.\n",
+      ".ast  <QUERY>    - Show the abstract syntax tree for QUERY\n",
       ".exit            - Quits this application\n",
       ".open <FILENAME> - Close existing database and reopen FILENAME\n",
       ".read <FILENAME> - Read input from FILENAME\n",
