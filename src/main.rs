@@ -2,6 +2,7 @@
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate log;
 
+mod intro_message;
 mod error;
 mod meta_command;
 mod sql_query;
@@ -15,6 +16,7 @@ use rustyline::Editor;
 use rustyline::error::ReadlineError;
 use env_logger::Env;
 
+use intro_message::intro_message;
 use meta_command::handle_meta_command;
 use sql_query::handle_sql_query;
 use read_eval_print_loop::{
@@ -63,6 +65,8 @@ fn main() -> rustyline::Result<()> {
   if repl.load_history(history_file).is_err() {
     println!("No more history");
   }
+
+  intro_message();
 
   loop {
     let print = format!("nolladb>");

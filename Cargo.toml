@@ -2,6 +2,8 @@
 name = "nolladb"
 version = "0.1.0"
 edition = "2021"
+authors = ["strugglebak <strugglebak@gmail.com>"]
+description = "NollaDB is an in-memory database."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -13,7 +15,7 @@ rustyline = "9.1.2"
 rustyline-derive = "0.6.0"
 serde = { version = "1.0.133", features = ["derive", "rc"] }
 prettytable-rs = "^0.8"
-clap = { version = "3.0.14", features = ["derive"] }
+clap = { version = "3.0.14", features = ["cargo"] }
 env_logger = "0.9.0"
 log = "0.4.14"
 
