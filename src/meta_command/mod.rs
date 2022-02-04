@@ -59,7 +59,7 @@ impl fmt::Display for MetaCommand {
 
 fn handle_exit_or_quit_meta_command(
   repl_helper: &mut Editor<RealEvalPrintLoopHelper>
-) -> Result<(MetaCommand)> {
+) -> Result<MetaCommand> {
   repl_helper.append_history(".history").unwrap();
   std::process::exit(0)
 }
@@ -79,7 +79,7 @@ fn get_str_after_meta_command(
 pub fn handle_meta_command(
   command: MetaCommand,
   repl_helper: &mut Editor<RealEvalPrintLoopHelper>
-) -> Result<(MetaCommand)> {
+) -> Result<MetaCommand> {
   match command {
     MetaCommand::Exit => handle_exit_or_quit_meta_command(repl_helper),
     MetaCommand::Quit => handle_exit_or_quit_meta_command(repl_helper),
@@ -96,10 +96,10 @@ pub fn handle_meta_command(
         ".save <FILENAME> - Write in-memory database into FILENAME\n",
         ".tables          - List names of tables\n",
       );
-      Ok((command))
+      Ok(command)
     },
     MetaCommand::Tables => {
-      Ok((command))
+      Ok(command)
     },
     MetaCommand::Open(args) => {
       match get_str_after_meta_command(
@@ -141,7 +141,7 @@ pub fn handle_meta_command(
         }
         Err(error) => return Err(error),
       }
-      Ok((command))
+      Ok(command)
     },
     MetaCommand::Unknown => Err(NollaDBError::UnknownCommand(format!(
       "Unknown command or invalid arguments. Enter '.help'"
