@@ -123,6 +123,16 @@ fn main() -> rustyline::Result<()> {
                       Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
                   },
+                  MetaCommand::Tables => {
+                    let table_names = database.get_all_tables(
+                      &database_manager,
+                      database.database_name.clone()
+                    ).unwrap();
+
+                    for table_name in table_names {
+                      println!("{}", table_name);
+                    }
+                  },
                   _ => (),
                 }
               },
