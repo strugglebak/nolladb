@@ -115,7 +115,13 @@ fn main() -> rustyline::Result<()> {
                       Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
                   },
-                  MetaCommand::Save(args) => {
+                  MetaCommand::Save(database_name) => {
+                    // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
+                    println!("saving {}.db...", database_name.clone());
+                    match Database::save(database_name.clone(), database.clone()) {
+                      Ok(_) => println!("saving {}.db done", database_name.to_string()),
+                      Err(error) => eprintln!("An error occurred: {:?}", error),
+                    }
                   },
                   _ => (),
                 }
