@@ -108,9 +108,11 @@ fn main() -> rustyline::Result<()> {
                     }
                   },
                   MetaCommand::Read(database_name) => {
-                    match Database::read(database_name) {
+                    println!("reading {}...", database_name.clone());
+                    match Database::read(database_name.clone()) {
                       Ok(data) => {
                         database = data;
+                        println!("reading {} done", database_name);
                       },
                       Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
