@@ -23,7 +23,7 @@ use column::Column;
 use column::data_type::DataType;
 use column::index::Index;
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 pub struct Table {
   pub primary_key: String,
   pub table_name: String,

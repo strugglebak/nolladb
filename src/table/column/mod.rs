@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use index::Index;
 use data_type::DataType;
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 pub struct Column {
   pub column_name: String,
   pub column_datatype: DataType,

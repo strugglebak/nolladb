@@ -59,52 +59,73 @@ impl fmt::Display for MetaCommand {
 
 fn handle_exit_or_quit_meta_command(
   repl_helper: &mut Editor<RealEvalPrintLoopHelper>
-) -> Result<String> {
+) -> Result<(MetaCommand)> {
   repl_helper.append_history(".history").unwrap();
   std::process::exit(0)
+}
+
+fn get_str_after_meta_command(
+  ref args: String,
+  error_message: &str,
+) -> Result<String> {
+  let mut args_vec = args.split_whitespace().collect::<Vec<&str>>();
+  if args_vec.len() == 1 {
+    return Err(NollaDBError::UnknownCommand(error_message.to_string()));
+  }
+  let result = args_vec.split_off(1).join(" ");
+  Ok(result)
 }
 
 pub fn handle_meta_command(
   command: MetaCommand,
   repl_helper: &mut Editor<RealEvalPrintLoopHelper>
-) -> Result<String> {
+) -> Result<(MetaCommand)> {
   match command {
-    MetaCommand::Exit => {
-      handle_exit_or_quit_meta_command(repl_helper)
+    MetaCommand::Exit => handle_exit_or_quit_meta_command(repl_helper),
+    MetaCommand::Quit => handle_exit_or_quit_meta_command(repl_helper),
+    MetaCommand::Help => {
+      println!(
+        "{}{}{}{}{}{}{}{}{}",
+        "Special commands:\n",
+        ".help            - Display help message\n",
+        "---------------------------------------\n",
+        ".ast  <QUERY>    - Show the abstract syntax tree for QUERY\n",
+        ".exit            - Quits this application\n",
+        ".open <FILENAME> - Close existing database and reopen FILENAME\n",
+        ".read <FILENAME> - Read input from FILENAME\n",
+        ".save <FILENAME> - Write in-memory database into FILENAME\n",
+        ".tables          - List names of tables\n",
+      );
+      Ok((command))
     },
-    MetaCommand::Quit => {
-      handle_exit_or_quit_meta_command(repl_helper)
+    MetaCommand::Tables => {
+      Ok((command))
     },
-    MetaCommand::Help => Ok(format!(
-      "{}{}{}{}{}{}{}{}{}",
-      "Special commands:\n",
-      ".help            - Display help message\n",
-      "---------------------------------------\n",
-      ".ast  <QUERY>    - Show the abstract syntax tree for QUERY\n",
-      ".exit            - Quits this application\n",
-      ".open <FILENAME> - Close existing database and reopen FILENAME\n",
-      ".read <FILENAME> - Read input from FILENAME\n",
-      ".save <FILENAME> - Write in-memory database into FILENAME\n",
-      ".tables          - List names of tables\n",
+    MetaCommand::Open(args) => Ok(MetaCommand::Open(
+      get_str_after_meta_command(
+        args.to_string(),
+        ".open <FILENAME>: FILENAME should not be empty",
+      ).unwrap()
     )),
-    MetaCommand::Tables => Ok(format!("To be implemented: {}", ".tables".to_string())),
-    MetaCommand::Open(args) => Ok(format!("To be implemented: {}", args)),
-    MetaCommand::Read(args) => Ok(format!("To be implemented: {}", args)),
-    MetaCommand::Save(args) => Ok(format!("To be implemented: {}", args)),
-    MetaCommand::Ast(args) => {
-      let mut args_vec = args.split_whitespace().collect::<Vec<&str>>();
-      if args_vec.len() == 0 {
-        return Err(NollaDBError::UnknownCommand(format!(
-          "ast <QUERY>: QUERY should not be empty"
-        )));
-      } else if args_vec.len() > 1 {
-        return Err(NollaDBError::UnknownCommand(format!(
-          "ast <QUERY>: QUERY should not be only one"
-        )));
-      }
-      let query = args_vec.split_off(1).join(" ");
+    MetaCommand::Read(args) => Ok(MetaCommand::Read(
+      get_str_after_meta_command(
+        args.to_string(),
+        ".read <FILENAME>: FILENAME should not be empty",
+      ).unwrap()
+    )),
+    MetaCommand::Save(args) => Ok(MetaCommand::Save(
+      get_str_after_meta_command(
+        args.to_string(),
+        ".save <FILENAME>: FILENAME should not be empty",
+      ).unwrap()
+    )),
+    MetaCommand::Ast(ref args) => {
+      let query = get_str_after_meta_command(
+        args.to_string(),
+        ".ast <QUERY>: QUERY should not be empty",
+      ).unwrap();
       println!("{:#?}", get_sql_ast(&query.to_string()).unwrap());
-      Ok(args)
+      Ok((command))
     },
     MetaCommand::Unknown => Err(NollaDBError::UnknownCommand(format!(
       "Unknown command or invalid arguments. Enter '.help'"

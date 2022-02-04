@@ -1,4 +1,4 @@
-mod database_manager;
+pub mod database_manager;
 
 use std::collections::{HashMap};
 
@@ -9,11 +9,25 @@ use crate::error::{Result, NollaDBError};
 
 use database_manager::DatabaseManager;
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 pub struct Database {
   pub database_name: String,
   pub tables: HashMap<String, Table>,
 }
+
+// use std::ops::{Deref, DerefMut};
+// impl Deref for Database {
+//     type Target = Database;
+//     fn deref<'a>(&'a self) -> &'a Database {
+//         &self
+//     }
+// }
+// impl DerefMut for Database {
+//     fn deref_mut<'a>(&'a mut self) -> &'a mut Database {
+//         &mut self
+//     }
+// }
+
 impl Database {
   pub fn new(database_name: String) -> Self {
     Database {

@@ -17,7 +17,7 @@ use rustyline::error::ReadlineError;
 use env_logger::Env;
 
 use intro_message::intro_message;
-use meta_command::handle_meta_command;
+use meta_command::{MetaCommand, handle_meta_command};
 use sql_query::handle_sql_query;
 use read_eval_print_loop::{
   RealEvalPrintLoopHelper,
@@ -26,6 +26,7 @@ use read_eval_print_loop::{
   get_command_type,
 };
 use database::Database;
+use database::database_manager::DatabaseManager;
 
 fn main() -> rustyline::Result<()> {
 
@@ -47,7 +48,9 @@ fn main() -> rustyline::Result<()> {
     println!("Database name should end with '.db'");
     process::exit(1)
   }
+
   let mut database = Database::new(database_name.to_string());
+  let mut database_manager = DatabaseManager::new(database.clone());
 
   // 创建 repl helper
   let repl_helper = RealEvalPrintLoopHelper::default();
@@ -85,7 +88,24 @@ fn main() -> rustyline::Result<()> {
         match command_type {
           CommandType::MetaCommand(cmd) => {
             match handle_meta_command(cmd, &mut repl) {
-              Ok(response) => println!("{} done", response),
+              Ok(response) => {
+                match response {
+                  MetaCommand::Open(database_name) => {
+                    if database_name == "" {
+                      continue;
+                    }
+                    database =
+                      Database::open(&database_manager, database_name)
+                      .unwrap()
+                      .clone();
+                  },
+                  MetaCommand::Read(args) => {
+                  },
+                  MetaCommand::Save(args) => {
+                  },
+                  _ => (),
+                }
+              },
               Err(error) => eprintln!("An error occurred: {:?}", error),
             }
           },
