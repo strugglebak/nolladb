@@ -31,16 +31,13 @@ impl Database {
     Ok(database_manager.get_database(database_name).unwrap())
   }
 
-  pub fn read(
-    &self,
-    database_name: String
-  ) -> Result<Self> {
-    // 从磁盘读取到内存
+  // 从磁盘读取到内存
+  pub fn read(database_name: String) -> Result<Self> {
     Ok(DatabaseManager::read_data(&database_name.to_string()))
   }
 
+  // 从内存写入到磁盘
   pub fn save(database_name: String, data: Database) -> Result<()> {
-    // 从内存写入到磁盘
     DatabaseManager::write_data(
       &database_name.to_string(),
       &data,
@@ -48,9 +45,20 @@ impl Database {
     Ok(())
   }
 
-  // TODO:
-  // pub fn get_all_tables() -> Self {
-  // }
+  // 得到指定的 database 里的所有 table name
+  pub fn get_all_tables(
+    &self,
+    database_manager: &DatabaseManager,
+    database_name: String
+  ) -> Result<Vec<String>> {
+    let database = Database::open(&database_manager, database_name).unwrap();
+    Ok(
+      database.tables
+        .iter()
+        .map(|(key, _)| key.to_string())
+        .collect()
+    )
+  }
 
   pub fn has_table(&self, table_name: String) -> bool {
     self.tables.contains_key(&table_name)

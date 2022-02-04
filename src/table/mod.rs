@@ -224,7 +224,7 @@ impl Table {
 
   pub fn insert_row(
     &mut self,
-   table_column_names: &Vec<String>,
+    table_column_names: &Vec<String>,
     table_column_value: &Vec<String>,
   ) {
     let mut new_row_id = self.most_recent_row_id + i64::from(1);
