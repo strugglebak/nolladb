@@ -85,13 +85,13 @@ fn main() -> rustyline::Result<()> {
         match command_type {
           CommandType::MetaCommand(cmd) => {
             match handle_meta_command(cmd, &mut repl) {
-              Ok(response) => println!("{}", response),
+              Ok(response) => println!("{} done", response),
               Err(error) => eprintln!("An error occurred: {:?}", error),
             }
           },
           CommandType::SQLQuery(_) => {
             match handle_sql_query(&command, &mut database) {
-              Ok(response) => println!("{}", response),
+              Ok(response) => println!("{} done", response),
               Err(error) => eprintln!("An error occurred: {:?}", error),
             }
           }
