@@ -91,13 +91,13 @@ fn main() -> rustyline::Result<()> {
               Ok(response) => {
                 match response {
                   MetaCommand::Open(database_name) => {
-                    if database_name == "" {
-                      continue;
+                    match Database::open(&database_manager, database_name) {
+                      Ok(new_database) => {
+                        // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
+                        database = new_database.clone();
+                      },
+                      Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
-                    database =
-                      Database::open(&database_manager, database_name)
-                      .unwrap()
-                      .clone();
                   },
                   MetaCommand::Read(args) => {
                   },

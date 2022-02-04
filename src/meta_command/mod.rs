@@ -101,30 +101,46 @@ pub fn handle_meta_command(
     MetaCommand::Tables => {
       Ok((command))
     },
-    MetaCommand::Open(args) => Ok(MetaCommand::Open(
-      get_str_after_meta_command(
+    MetaCommand::Open(args) => {
+      match get_str_after_meta_command(
         args.to_string(),
         ".open <FILENAME>: FILENAME should not be empty",
-      ).unwrap()
-    )),
-    MetaCommand::Read(args) => Ok(MetaCommand::Read(
-      get_str_after_meta_command(
+      ) {
+        Ok(args) => Ok(MetaCommand::Open(args)),
+        Err(error) => return Err(error),
+      }
+    },
+    MetaCommand::Read(args) => {
+      match get_str_after_meta_command(
         args.to_string(),
         ".read <FILENAME>: FILENAME should not be empty",
-      ).unwrap()
-    )),
-    MetaCommand::Save(args) => Ok(MetaCommand::Save(
-      get_str_after_meta_command(
+      ) {
+        Ok(args) => Ok(MetaCommand::Open(args)),
+        Err(error) => return Err(error),
+      }
+    },
+    MetaCommand::Save(args) => {
+      match get_str_after_meta_command(
         args.to_string(),
         ".save <FILENAME>: FILENAME should not be empty",
-      ).unwrap()
-    )),
+      ) {
+        Ok(args) => Ok(MetaCommand::Open(args)),
+        Err(error) => return Err(error),
+      }
+    },
     MetaCommand::Ast(ref args) => {
-      let query = get_str_after_meta_command(
+      match get_str_after_meta_command(
         args.to_string(),
         ".ast <QUERY>: QUERY should not be empty",
-      ).unwrap();
-      println!("{:#?}", get_sql_ast(&query.to_string()).unwrap());
+      ) {
+        Ok(query) => {
+          match get_sql_ast(&query.to_string()) {
+            Ok(print_ast) => println!("{:#?}", print_ast),
+            Err(error) => return Err(error),
+          }
+        }
+        Err(error) => return Err(error),
+      }
       Ok((command))
     },
     MetaCommand::Unknown => Err(NollaDBError::UnknownCommand(format!(

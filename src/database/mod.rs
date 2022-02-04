@@ -42,7 +42,10 @@ impl Database {
   ) -> Result<&Self> {
     // TODO: 通过文件找到 database 路径
     // 目前先默认在当前目录
-    Ok(database_manager.get_database(database_name).unwrap())
+    match database_manager.get_database(database_name) {
+      Ok(database) => Ok(database),
+      Err(error) => return Err(error)
+    }
   }
 
   // 从磁盘读取到内存
