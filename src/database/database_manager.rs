@@ -24,14 +24,14 @@ impl DatabaseManager {
   }
 
   pub fn write_data(filename: &str, data: &impl Serialize) {
-    let filename = format!("{}.db", filename);
+    let filename = format!("{}", filename);
     let bytes: Vec<u8> = serialize(&data).unwrap();
     let mut file = File::create(filename).unwrap();
     file.write_all(&bytes).unwrap();
   }
 
   pub fn read_data<T: DeserializeOwned>(filename: &str) -> Result<T> {
-      let filename = format!("{}.db", filename);
+      let filename = format!("{}", filename);
       let mut file = File::open(filename).unwrap();
       let mut buffer = Vec::<u8>::new();
       file.read_to_end(&mut buffer).unwrap();

@@ -99,10 +99,10 @@ fn main() -> rustyline::Result<()> {
                   MetaCommand::Open(database_name) => {
                     match Database::open(&database_manager, database_name) {
                       Ok(new_database) => {
-                        println!("Opening {}.db...", new_database.database_name);
+                        println!("Opening {}...", new_database.database_name);
                         // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
                         database = new_database.clone();
-                        println!("Opening {}.db done", database.database_name);
+                        println!("Opening {} done", database.database_name);
                       },
                       Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
@@ -117,9 +117,9 @@ fn main() -> rustyline::Result<()> {
                   },
                   MetaCommand::Save(database_name) => {
                     // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
-                    println!("saving {}.db...", database_name.clone());
+                    println!("saving {}...", database_name.clone());
                     match Database::save(database_name.clone(), database.clone()) {
-                      Ok(_) => println!("saving {}.db done", database_name.to_string()),
+                      Ok(_) => println!("saving {} done", database_name.to_string()),
                       Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
                   },

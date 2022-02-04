@@ -115,7 +115,7 @@ pub fn handle_meta_command(
         args.to_string(),
         ".read <FILENAME>: FILENAME should not be empty",
       ) {
-        Ok(args) => Ok(MetaCommand::Open(args)),
+        Ok(args) => Ok(MetaCommand::Read(args)),
         Err(error) => return Err(error),
       }
     },
@@ -124,7 +124,7 @@ pub fn handle_meta_command(
         args.to_string(),
         ".save <FILENAME>: FILENAME should not be empty",
       ) {
-        Ok(args) => Ok(MetaCommand::Open(args)),
+        Ok(args) => Ok(MetaCommand::Save(args)),
         Err(error) => return Err(error),
       }
     },
