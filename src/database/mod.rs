@@ -1,3 +1,5 @@
+mod database_map;
+
 use std::collections::{HashMap};
 
 use serde::{Deserialize, Serialize};
@@ -5,12 +7,13 @@ use serde::{Deserialize, Serialize};
 use crate::table::Table;
 use crate::error::{Result, NollaDBError};
 
+use database_map::DatabaseMap;
+
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct Database {
   pub database_name: String,
   pub tables: HashMap<String, Table>,
 }
-
 impl Database {
   pub fn new(database_name: String) -> Self {
     Database {
@@ -19,16 +22,18 @@ impl Database {
     }
   }
 
-  // TODO:
-  // pub fn open(database_name: String) -> Self {
-  // }
+  pub fn open(database_map: &DatabaseMap, database_name: String) -> Result<&Self> {
+    // TODO: 通过文件找到 database 路径
+    // 目前先默认在当前目录
+    Ok(database_map.get_database(database_name).unwrap())
+  }
 
-  // TODO:
   // pub fn read(database_name: String) -> Self {
+  //   // 从磁盘读取到内存
   // }
 
-  // TODO:
   // pub fn save(database_name: String) -> Self {
+  //   // 从内存写入到磁盘
   // }
 
   // TODO:

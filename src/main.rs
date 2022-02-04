@@ -1,6 +1,6 @@
 
 #[macro_use] extern crate prettytable;
-#[macro_use] extern crate log;
+// #[macro_use] extern crate log;
 
 mod intro_message;
 mod error;
