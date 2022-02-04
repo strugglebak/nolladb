@@ -29,7 +29,7 @@ pub struct Database {
 // }
 
 impl Database {
-  pub fn new(database_name: String) -> Self {
+  pub fn new(database_name: String) -> Database {
     Database {
       database_name,
       tables: HashMap::new(),
@@ -50,7 +50,11 @@ impl Database {
 
   // 从磁盘读取到内存
   pub fn read(database_name: String) -> Result<Self> {
-    Ok(DatabaseManager::read_data(&database_name.to_string()))
+    match
+      DatabaseManager::read_data(&database_name.to_string()) {
+        Ok(data) => Ok(data),
+        Err(error) => return Err(error),
+    }
   }
 
   // 从内存写入到磁盘

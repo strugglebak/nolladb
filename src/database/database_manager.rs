@@ -12,10 +12,8 @@ pub struct DatabaseManager {
   pub database: HashMap<String, Database>,
 }
 impl DatabaseManager {
-  pub fn new(database: Database) -> Self {
-    DatabaseManager {
-      database: HashMap::new(),
-    }
+  pub fn new() -> DatabaseManager {
+    DatabaseManager { database: HashMap::new(), }
   }
 
   pub fn get_database(&self, database_name: String) -> Result<&Database> {
@@ -32,12 +30,12 @@ impl DatabaseManager {
     file.write_all(&bytes).unwrap();
   }
 
-  pub fn read_data<T: DeserializeOwned>(filename: &str) -> T {
+  pub fn read_data<T: DeserializeOwned>(filename: &str) -> Result<T> {
       let filename = format!("{}.db", filename);
       let mut file = File::open(filename).unwrap();
       let mut buffer = Vec::<u8>::new();
       file.read_to_end(&mut buffer).unwrap();
       let decoded: T = deserialize(&buffer[..]).unwrap();
-      decoded
+      Ok(decoded)
   }
 }

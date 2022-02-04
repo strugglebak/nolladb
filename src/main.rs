@@ -49,8 +49,14 @@ fn main() -> rustyline::Result<()> {
     process::exit(1)
   }
 
+  // 初始化 database 相关
+  // TODO: 待优化
   let mut database = Database::new(database_name.to_string());
-  let mut database_manager = DatabaseManager::new(database.clone());
+  let mut database_manager = DatabaseManager::new();
+  database_manager.database.insert(
+    database.database_name.clone(),
+    database.clone()
+  );
 
   // 创建 repl helper
   let repl_helper = RealEvalPrintLoopHelper::default();
@@ -93,13 +99,21 @@ fn main() -> rustyline::Result<()> {
                   MetaCommand::Open(database_name) => {
                     match Database::open(&database_manager, database_name) {
                       Ok(new_database) => {
+                        println!("Opening {}.db...", new_database.database_name);
                         // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
                         database = new_database.clone();
+                        println!("Opening {}.db done", database.database_name);
                       },
                       Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
                   },
-                  MetaCommand::Read(args) => {
+                  MetaCommand::Read(database_name) => {
+                    match Database::read(database_name) {
+                      Ok(data) => {
+                        database = data;
+                      },
+                      Err(error) => eprintln!("An error occurred: {:?}", error),
+                    }
                   },
                   MetaCommand::Save(args) => {
                   },
