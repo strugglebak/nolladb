@@ -93,9 +93,13 @@ pub fn handle_meta_command(
     MetaCommand::Save(args) => Ok(format!("To be implemented: {}", args)),
     MetaCommand::Ast(args) => {
       let mut args_vec = args.split_whitespace().collect::<Vec<&str>>();
-      if args_vec.len() <= 1 {
+      if args_vec.len() == 0 {
         return Err(NollaDBError::UnknownCommand(format!(
           "ast <QUERY>: QUERY should not be empty"
+        )));
+      } else if args_vec.len() > 1 {
+        return Err(NollaDBError::UnknownCommand(format!(
+          "ast <QUERY>: QUERY should not be only one"
         )));
       }
       let query = args_vec.split_off(1).join(" ");
