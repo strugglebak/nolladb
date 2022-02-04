@@ -1,6 +1,7 @@
 {
   "cmake.configureOnOpen": false,
   "cSpell.words": [
+    "bincode",
     "Nolla",
     "nolladb",
     "prettytable",
@@ -11,6 +12,7 @@
     "rustyline",
     "serde",
     "sqlparser",
+    "strugglebak",
     "testdb",
     "thiserror"
   ]
