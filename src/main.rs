@@ -53,10 +53,29 @@ fn main() -> rustyline::Result<()> {
   // TODO: 待优化
   let mut database = Database::new(database_name.to_string());
   let mut database_manager = DatabaseManager::new();
-  database_manager.database.insert(
-    database.database_name.clone(),
-    database.clone()
-  );
+  let database_manager_file = String::from(".dmf");
+  // 先读 database 文件
+  println!("reading {}...", database_name.clone());
+  match Database::read(database_name.clone()) {
+    Ok(data) => {
+      database = data;
+      println!("reading {} done", database_name);
+      // 然后读 database_manager 文件
+      match DatabaseManager::read(database_manager_file.clone()) {
+        Ok(data) => {
+          database_manager = data;
+          if !database_manager.has_database(database.database_name.clone()) {
+            database_manager.database.insert(
+              database.database_name.clone(),
+              database.clone()
+            );
+          }
+        },
+        Err(error) => eprintln!("An error occurred: {:?}", error),
+      }
+    },
+    Err(error) => eprintln!("An error occurred: {:?}", error),
+  }
 
   // 创建 repl helper
   let repl_helper = RealEvalPrintLoopHelper::default();
@@ -113,6 +132,19 @@ fn main() -> rustyline::Result<()> {
                       Ok(data) => {
                         database = data;
                         println!("reading {} done", database_name);
+                        // 然后读 database_manager 文件
+                        match DatabaseManager::read(database_manager_file.clone()) {
+                          Ok(data) => {
+                            database_manager = data;
+                            if !database_manager.has_database(database.database_name.clone()) {
+                              database_manager.database.insert(
+                                database.database_name.clone(),
+                                database.clone()
+                              );
+                            }
+                          },
+                          Err(error) => eprintln!("An error occurred: {:?}", error),
+                        }
                       },
                       Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
@@ -121,7 +153,17 @@ fn main() -> rustyline::Result<()> {
                     // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
                     println!("saving {}...", database_name.clone());
                     match Database::save(database_name.clone(), database.clone()) {
-                      Ok(_) => println!("saving {} done", database_name.to_string()),
+                      Ok(_) => {
+                        println!("saving {} done", database_name.to_string());
+                        // save 完成之后同样要 save database_manager 文件
+                        match DatabaseManager::save(
+                          database_manager_file.clone(),
+                          database_manager.clone()
+                        ) {
+                          Err(error) => eprintln!("An error occurred: {:?}", error),
+                          _ => (),
+                        }
+                      }
                       Err(error) => eprintln!("An error occurred: {:?}", error),
                     }
                   },

@@ -7,7 +7,7 @@ use bincode::{deserialize, serialize};
 use crate::error::{Result, NollaDBError};
 use crate::database::Database;
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 pub struct DatabaseManager {
   pub database: HashMap<String, Database>,
 }
@@ -21,6 +21,38 @@ impl DatabaseManager {
       Some(database) => Ok(database),
       _ => Err(NollaDBError::General(String::from("Database not found"))),
     }
+  }
+
+  pub fn has_database(&self, database_name: String) -> bool {
+    self.database.contains_key(&database_name)
+  }
+
+  // 从磁盘读取到内存
+  pub fn read(filename: String) -> Result<Self> {
+    // 先看 filename 在不在，不在就创建
+    if let Err(_) = File::open(filename.clone()) {
+      DatabaseManager::write_data(
+        &filename.to_string(),
+        &DatabaseManager::new()
+      );
+    }
+
+    match
+      DatabaseManager::read_data(&filename.to_string()) {
+        Ok(data) => Ok(data),
+        Err(error) => {
+          return Err(error);
+        },
+    }
+  }
+
+  // 从内存写入到磁盘
+  pub fn save(filename: String, data: DatabaseManager) -> Result<()> {
+    DatabaseManager::write_data(
+      &filename.to_string(),
+      &data,
+    );
+    Ok(())
   }
 
   pub fn write_data(filename: &str, data: &impl Serialize) {
