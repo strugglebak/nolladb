@@ -185,7 +185,14 @@ fn main() -> rustyline::Result<()> {
           },
           CommandType::SQLQuery(_) => {
             match handle_sql_query(&command, &mut database) {
-              Ok(response) => println!("{}", response),
+              Ok(response) => {
+                println!("{}", response);
+                // SQL statement 执行成功后要更新 database 以及 database_manager
+                database_manager.database.insert(
+                  database.database_name.clone(),
+                  database.clone()
+                );
+              },
               Err(error) => eprintln!("An error occurred: {:?}", error),
             }
           }
