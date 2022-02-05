@@ -143,7 +143,7 @@ fn main() -> rustyline::Result<()> {
           },
           CommandType::SQLQuery(_) => {
             match handle_sql_query(&command, &mut database) {
-              Ok(response) => println!("{} done", response),
+              Ok(response) => println!("{}", response),
               Err(error) => eprintln!("An error occurred: {:?}", error),
             }
           }
