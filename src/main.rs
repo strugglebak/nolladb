@@ -50,7 +50,6 @@ fn main() -> rustyline::Result<()> {
   }
 
   // 初始化 database 相关
-  // TODO: 待优化
   let mut database:Database;
   let mut database_manager:DatabaseManager;
   let database_manager_file = String::from(".dmf");
