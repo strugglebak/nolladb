@@ -40,7 +40,9 @@ impl Database {
     database_name: String,
     database_manager_file: String
   ) -> Result<(Database, DatabaseManager)> {
+    #[allow(unused_assignments)]
     let mut database = Database::new(database_name.clone());
+    #[allow(unused_assignments)]
     let mut database_manager = DatabaseManager::new();
 
     println!("reading {}...", database_name.clone());
@@ -157,6 +159,7 @@ impl Database {
     self.tables.contains_key(&table_name)
   }
 
+  #[allow(dead_code)]
   pub fn get_table(&self, table_name: String) -> Result<&Table> {
     match self.tables.get(&table_name) {
       Some(table) => Ok(table),

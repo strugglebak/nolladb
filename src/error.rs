@@ -19,6 +19,7 @@ pub enum NollaDBError {
 
 pub type Result<T> = result::Result<T, NollaDBError>;
 
+#[allow(dead_code)]
 pub fn nolladb_error(text: &str) -> NollaDBError {
   NollaDBError::General(text.to_owned())
 }

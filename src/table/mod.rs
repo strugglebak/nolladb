@@ -141,6 +141,7 @@ impl Table {
       .any(|table_column| table_column.column_name == column_name)
   }
 
+  #[allow(dead_code)]
   pub fn get_column(&mut self, column_name: String) -> Result<&Column> {
     for table_column in self.table_columns.iter() {
       if table_column.column_name == column_name {
