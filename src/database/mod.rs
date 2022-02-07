@@ -36,7 +36,7 @@ impl Database {
     }
   }
 
-  pub fn init(
+  pub fn start(
     database_name: String,
     database_manager_file: String
   ) -> Result<(Database, DatabaseManager)> {
@@ -76,6 +76,29 @@ impl Database {
     Ok((database, database_manager))
   }
 
+  pub fn end(
+    database_name: String,
+    database: &Database,
+    database_manager_file: String,
+    database_manager: &DatabaseManager,
+  ) -> Result<()> {
+    println!("saving {}...", database_name.clone());
+    match Database::save(database_name.clone(), database) {
+      Ok(_) => {
+        println!("saving {} done", database_name.to_string());
+        // save 完成之后同样要 save database_manager 文件
+        match DatabaseManager::save(
+          database_manager_file.clone(),
+          database_manager,
+        ) {
+          Ok(()) => Ok(()),
+          Err(error) => return Err(error),
+        }
+      }
+      Err(error) => return Err(error),
+    }
+  }
+
   pub fn open(
     database_manager: &DatabaseManager,
     database_name: String
@@ -83,6 +106,18 @@ impl Database {
     // TODO: 通过文件找到 database 路径
     // 目前先默认在当前目录
     match database_manager.get_database(database_name) {
+      Ok(database) => Ok(database),
+      Err(error) => return Err(error)
+    }
+  }
+
+  pub fn open_mut(
+    database_manager: &mut DatabaseManager,
+    database_name: String
+  ) -> Result<&mut Self> {
+    // TODO: 通过文件找到 database 路径
+    // 目前先默认在当前目录
+    match database_manager.get_database_mut(database_name) {
       Ok(database) => Ok(database),
       Err(error) => return Err(error)
     }

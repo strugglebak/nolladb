@@ -3,6 +3,8 @@ use rustyline::Editor;
 use crate::error::{Result, NollaDBError};
 use crate::read_eval_print_loop::{RealEvalPrintLoopHelper};
 use crate::sql_query::get_sql_ast;
+use crate::database::Database;
+use crate::database::database_manager::DatabaseManager;
 
 #[derive(Debug, PartialEq)]
 pub enum MetaCommand {
@@ -78,7 +80,9 @@ fn get_str_after_meta_command(
 
 pub fn handle_meta_command(
   command: MetaCommand,
-  repl_helper: &mut Editor<RealEvalPrintLoopHelper>
+  repl_helper: &mut Editor<RealEvalPrintLoopHelper>,
+  database: &mut Database,
+  database_manager: &mut DatabaseManager,
 ) -> Result<MetaCommand> {
   match command {
     MetaCommand::Exit => handle_exit_or_quit_meta_command(repl_helper),
@@ -99,6 +103,14 @@ pub fn handle_meta_command(
       Ok(command)
     },
     MetaCommand::Tables => {
+      let table_names = database.get_all_tables(
+        &database_manager,
+        database.database_name.clone()
+      ).unwrap();
+
+      for table_name in table_names {
+        println!("{}", table_name);
+      }
       Ok(command)
     },
     MetaCommand::Open(args) => {
@@ -156,32 +168,27 @@ mod test {
   use rstest::rstest;
   use pretty_assertions::assert_eq;
   use crate::read_eval_print_loop::{get_config, RealEvalPrintLoopHelper};
+  use crate::error::{Result as CustomResult};
 
   #[rstest]
   #[case(MetaCommand::Help)]
   fn test_help_meta_command(#[case] input: MetaCommand) {
-    let mut repl = init_repl().unwrap();
-    let result = handle_meta_command(input, &mut repl);
-
+    let result = gen_result(input);
     assert_eq!(result.is_ok(), true);
   }
 
   #[rstest]
   #[case(".open test.db")]
   fn test_open_meta_command(#[case] command: &str) {
-    let mut repl = init_repl().unwrap();
     let input = MetaCommand::Open(command.to_string());
-    let result = handle_meta_command(input, &mut repl);
-
+    let result = gen_result(input);
     assert_eq!(result.is_ok(), true);
   }
 
   #[rstest]
   #[case(MetaCommand::Unknown)]
   fn test_unknown_meta_command(#[case] input: MetaCommand) {
-    let mut repl = init_repl().unwrap();
-    let result = handle_meta_command(input, &mut repl);
-
+    let result = gen_result(input);
     assert_eq!(result.is_err(), true);
   }
 
@@ -217,5 +224,20 @@ mod test {
     repl.set_helper(Some(repl_helper));
 
     Ok(repl)
+  }
+
+  fn gen_result(input: MetaCommand) -> CustomResult<MetaCommand> {
+    let mut repl = init_repl().unwrap();
+    let mut database = Database::new("test".to_string());
+    let mut database_manager = DatabaseManager::new();
+    match handle_meta_command(
+      input,
+      &mut repl,
+      &mut database,
+      &mut database_manager
+    ) {
+      Ok(result) => Ok(result),
+      Err(error) => return Err(error),
+    }
   }
 }

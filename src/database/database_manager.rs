@@ -23,6 +23,13 @@ impl DatabaseManager {
     }
   }
 
+  pub fn get_database_mut(&mut self, database_name: String) -> Result<&mut Database> {
+    match self.database.get_mut(&database_name) {
+      Some(database) => Ok(database),
+      _ => Err(NollaDBError::General(String::from("Database not found"))),
+    }
+  }
+
   pub fn has_database(&self, database_name: String) -> bool {
     self.database.contains_key(&database_name)
   }
