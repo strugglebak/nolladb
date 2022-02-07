@@ -49,7 +49,6 @@ impl Database {
       &Database::new(database_name.clone())
     ) {
       Ok(data) => {
-        println!("database data {:#?}", data);
         database = data;
         println!("reading {} done", database_name);
         // 然后读 database_manager 文件
@@ -58,7 +57,6 @@ impl Database {
           &DatabaseManager::new(),
         ) {
           Ok(data) => {
-            println!("database manager data {:#?}", data);
             database_manager = data;
             if !database_manager.has_database(database.database_name.clone()) {
               database_manager.database.insert(
