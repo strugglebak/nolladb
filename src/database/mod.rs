@@ -1,7 +1,6 @@
 pub mod database_manager;
 
 use std::collections::{HashMap};
-use std::fs::File;
 
 use serde::{Deserialize, Serialize};
 
@@ -49,28 +48,15 @@ impl Database {
     }
   }
 
-  // 从磁盘读取到内存
   pub fn read(database_name: String) -> Result<Self> {
-    // 先看 filename 在不在，不在就创建
-    if let Err(_) = File::open(database_name.clone()) {
-      DatabaseManager::write_data(
-        &database_name.to_string(),
-        &Database::new(database_name.clone())
-      );
-    }
-    match
-      DatabaseManager::read_data(&database_name.to_string()) {
-        Ok(data) => Ok(data),
-        Err(error) => return Err(error),
+    match DatabaseManager::read(database_name) {
+      Ok(data) => Ok(data),
+      Err(error) => return Err(error),
     }
   }
 
-  // 从内存写入到磁盘
-  pub fn save(database_name: String, data: Database) -> Result<()> {
-    DatabaseManager::write_data(
-      &database_name.to_string(),
-      &data,
-    );
+  pub fn save(database_name: String, data: &Database) -> Result<()> {
+    DatabaseManager::save(database_name, data);
     Ok(())
   }
 

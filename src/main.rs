@@ -54,6 +54,7 @@ fn main() -> rustyline::Result<()> {
   let mut database = Database::new(database_name.to_string());
   let mut database_manager = DatabaseManager::new();
   let database_manager_file = String::from(".dmf");
+
   // 先读 database 文件
   println!("reading {}...", database_name.clone());
   match Database::read(database_name.clone()) {
@@ -150,15 +151,14 @@ fn main() -> rustyline::Result<()> {
                     }
                   },
                   MetaCommand::Save(database_name) => {
-                    // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
                     println!("saving {}...", database_name.clone());
-                    match Database::save(database_name.clone(), database.clone()) {
+                    match Database::save(database_name.clone(), &mut database) {
                       Ok(_) => {
                         println!("saving {} done", database_name.to_string());
                         // save 完成之后同样要 save database_manager 文件
                         match DatabaseManager::save(
                           database_manager_file.clone(),
-                          database_manager.clone()
+                          &mut database_manager,
                         ) {
                           Err(error) => eprintln!("An error occurred: {:?}", error),
                           _ => (),
