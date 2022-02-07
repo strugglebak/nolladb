@@ -141,6 +141,8 @@ pub fn handle_sql_query(sql_query: &str, database: &mut Database) -> Result<Stri
                 )));
               }
 
+              // TODO: 这里有一种情况是 SQL 里面没有指定列名，那么就按照顺序写入
+
               for table_column_value in table_column_values {
                 // 1. 检查要插入的 column value 的个数是否和 column name 一致
                 let v_len = table_column_value.len();

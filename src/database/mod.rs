@@ -1,7 +1,6 @@
 pub mod database_manager;
 
 use std::collections::{HashMap};
-use std::fs::File;
 
 use serde::{Deserialize, Serialize};
 
@@ -37,6 +36,69 @@ impl Database {
     }
   }
 
+  pub fn start(
+    database_name: String,
+    database_manager_file: String
+  ) -> Result<(Database, DatabaseManager)> {
+    #[allow(unused_assignments)]
+    let mut database = Database::new(database_name.clone());
+    #[allow(unused_assignments)]
+    let mut database_manager = DatabaseManager::new();
+
+    println!("reading {}...", database_name.clone());
+    match Database::read(
+      database_name.clone(),
+      &Database::new(database_name.clone())
+    ) {
+      Ok(data) => {
+        database = data;
+        println!("reading {} done", database_name);
+        // 然后读 database_manager 文件
+        match DatabaseManager::read(
+          database_manager_file.clone(),
+          &DatabaseManager::new(),
+        ) {
+          Ok(data) => {
+            database_manager = data;
+            if !database_manager.has_database(database.database_name.clone()) {
+              database_manager.database.insert(
+                database.database_name.clone(),
+                database.clone()
+              );
+            }
+          },
+          Err(error) => return Err(error),
+        }
+      },
+      Err(error) => return Err(error),
+    }
+
+    Ok((database, database_manager))
+  }
+
+  pub fn end(
+    database_name: String,
+    database: &Database,
+    database_manager_file: String,
+    database_manager: &DatabaseManager,
+  ) -> Result<()> {
+    println!("saving {}...", database_name.clone());
+    match Database::save(database_name.clone(), database) {
+      Ok(_) => {
+        println!("saving {} done", database_name.to_string());
+        // save 完成之后同样要 save database_manager 文件
+        match DatabaseManager::save(
+          database_manager_file.clone(),
+          database_manager,
+        ) {
+          Ok(()) => Ok(()),
+          Err(error) => return Err(error),
+        }
+      }
+      Err(error) => return Err(error),
+    }
+  }
+
   pub fn open(
     database_manager: &DatabaseManager,
     database_name: String
@@ -49,29 +111,33 @@ impl Database {
     }
   }
 
-  // 从磁盘读取到内存
-  pub fn read(database_name: String) -> Result<Self> {
-    // 先看 filename 在不在，不在就创建
-    if let Err(_) = File::open(database_name.clone()) {
-      DatabaseManager::write_data(
-        &database_name.to_string(),
-        &Database::new(database_name.clone())
-      );
-    }
-    match
-      DatabaseManager::read_data(&database_name.to_string()) {
-        Ok(data) => Ok(data),
-        Err(error) => return Err(error),
+  pub fn open_mut(
+    database_manager: &mut DatabaseManager,
+    database_name: String
+  ) -> Result<&mut Self> {
+    // TODO: 通过文件找到 database 路径
+    // 目前先默认在当前目录
+    match database_manager.get_database_mut(database_name) {
+      Ok(database) => Ok(database),
+      Err(error) => return Err(error)
     }
   }
 
-  // 从内存写入到磁盘
-  pub fn save(database_name: String, data: Database) -> Result<()> {
-    DatabaseManager::write_data(
-      &database_name.to_string(),
-      &data,
-    );
-    Ok(())
+  pub fn read(database_name: String, new_data: &impl Serialize) -> Result<Self> {
+    match DatabaseManager::read(
+      database_name.clone(),
+      new_data,
+    ) {
+      Ok(data) => Ok(data),
+      Err(error) => return Err(error),
+    }
+  }
+
+  pub fn save(database_name: String, data: &Database) -> Result<()> {
+    match DatabaseManager::save(database_name, data) {
+      Ok(()) => Ok(()),
+      Err(error) => return Err(error),
+    }
   }
 
   // 得到指定的 database 里的所有 table name
@@ -93,6 +159,7 @@ impl Database {
     self.tables.contains_key(&table_name)
   }
 
+  #[allow(dead_code)]
   pub fn get_table(&self, table_name: String) -> Result<&Table> {
     match self.tables.get(&table_name) {
       Some(table) => Ok(table),

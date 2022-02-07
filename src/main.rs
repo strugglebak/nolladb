@@ -50,31 +50,19 @@ fn main() -> rustyline::Result<()> {
   }
 
   // 初始化 database 相关
-  // TODO: 待优化
-  let mut database = Database::new(database_name.to_string());
-  let mut database_manager = DatabaseManager::new();
+  let mut database:Database;
+  let mut database_manager:DatabaseManager;
   let database_manager_file = String::from(".dmf");
-  // 先读 database 文件
-  println!("reading {}...", database_name.clone());
-  match Database::read(database_name.clone()) {
-    Ok(data) => {
-      database = data;
-      println!("reading {} done", database_name);
-      // 然后读 database_manager 文件
-      match DatabaseManager::read(database_manager_file.clone()) {
-        Ok(data) => {
-          database_manager = data;
-          if !database_manager.has_database(database.database_name.clone()) {
-            database_manager.database.insert(
-              database.database_name.clone(),
-              database.clone()
-            );
-          }
-        },
-        Err(error) => eprintln!("An error occurred: {:?}", error),
-      }
+
+  match Database::start(database_name.clone(), database_manager_file.clone()) {
+    Ok((new_database, new_database_manager)) => {
+      database = new_database;
+      database_manager = new_database_manager;
     },
-    Err(error) => eprintln!("An error occurred: {:?}", error),
+    Err(error) => {
+      eprintln!("An error occurred: {:?}", error);
+      process::exit(1)
+    }
   }
 
   // 创建 repl helper
@@ -112,14 +100,19 @@ fn main() -> rustyline::Result<()> {
         let command_type = get_command_type(&command.trim().to_owned());
         match command_type {
           CommandType::MetaCommand(cmd) => {
-            match handle_meta_command(cmd, &mut repl) {
+            match handle_meta_command(
+              cmd,
+              &mut repl,
+              &mut database,
+              &mut database_manager
+            ) {
               Ok(response) => {
                 match response {
-                  MetaCommand::Open(database_name) => {
-                    match Database::open(&database_manager, database_name) {
+                  MetaCommand::Open(new_database_name) => {
+                    match Database::open_mut(&mut database_manager, new_database_name) {
                       Ok(new_database) => {
                         println!("Opening {}...", new_database.database_name);
-                        // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
+                        // 这里 clone 去掉引用，拿到的就是引用指向的数据内容
                         database = new_database.clone();
                         println!("Opening {} done", database.database_name);
                       },
@@ -127,54 +120,25 @@ fn main() -> rustyline::Result<()> {
                     }
                   },
                   MetaCommand::Read(database_name) => {
-                    println!("reading {}...", database_name.clone());
-                    match Database::read(database_name.clone()) {
-                      Ok(data) => {
-                        database = data;
-                        println!("reading {} done", database_name);
-                        // 然后读 database_manager 文件
-                        match DatabaseManager::read(database_manager_file.clone()) {
-                          Ok(data) => {
-                            database_manager = data;
-                            if !database_manager.has_database(database.database_name.clone()) {
-                              database_manager.database.insert(
-                                database.database_name.clone(),
-                                database.clone()
-                              );
-                            }
-                          },
-                          Err(error) => eprintln!("An error occurred: {:?}", error),
-                        }
+                    match Database::start(database_name.clone(), database_manager_file.clone()) {
+                      Ok((new_database, new_database_manager)) => {
+                        database = new_database;
+                        database_manager = new_database_manager;
                       },
-                      Err(error) => eprintln!("An error occurred: {:?}", error),
+                      Err(error) => {
+                        eprintln!("An error occurred: {:?}", error);
+                      }
                     }
                   },
                   MetaCommand::Save(database_name) => {
-                    // TODO: 待优化，这里应该要拿到的是对应 database 的引用，而不是 clone
-                    println!("saving {}...", database_name.clone());
-                    match Database::save(database_name.clone(), database.clone()) {
-                      Ok(_) => {
-                        println!("saving {} done", database_name.to_string());
-                        // save 完成之后同样要 save database_manager 文件
-                        match DatabaseManager::save(
-                          database_manager_file.clone(),
-                          database_manager.clone()
-                        ) {
-                          Err(error) => eprintln!("An error occurred: {:?}", error),
-                          _ => (),
-                        }
-                      }
+                    match Database::end(
+                      database_name.clone(),
+                      &database,
+                      database_manager_file.clone(),
+                      &database_manager
+                    ) {
+                      Ok(()) => (),
                       Err(error) => eprintln!("An error occurred: {:?}", error),
-                    }
-                  },
-                  MetaCommand::Tables => {
-                    let table_names = database.get_all_tables(
-                      &database_manager,
-                      database.database_name.clone()
-                    ).unwrap();
-
-                    for table_name in table_names {
-                      println!("{}", table_name);
                     }
                   },
                   _ => (),
