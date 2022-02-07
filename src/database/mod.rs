@@ -36,6 +36,46 @@ impl Database {
     }
   }
 
+  pub fn init(
+    database_name: String,
+    database_manager_file: String
+  ) -> Result<(Database, DatabaseManager)> {
+    let mut database = Database::new(database_name.clone());
+    let mut database_manager = DatabaseManager::new();
+
+    println!("reading {}...", database_name.clone());
+    match Database::read(
+      database_name.clone(),
+      &Database::new(database_name.clone())
+    ) {
+      Ok(data) => {
+        println!("database data {:#?}", data);
+        database = data;
+        println!("reading {} done", database_name);
+        // 然后读 database_manager 文件
+        match DatabaseManager::read(
+          database_manager_file.clone(),
+          &DatabaseManager::new(),
+        ) {
+          Ok(data) => {
+            println!("database manager data {:#?}", data);
+            database_manager = data;
+            if !database_manager.has_database(database.database_name.clone()) {
+              database_manager.database.insert(
+                database.database_name.clone(),
+                database.clone()
+              );
+            }
+          },
+          Err(error) => return Err(error),
+        }
+      },
+      Err(error) => return Err(error),
+    }
+
+    Ok((database, database_manager))
+  }
+
   pub fn open(
     database_manager: &DatabaseManager,
     database_name: String
@@ -48,16 +88,21 @@ impl Database {
     }
   }
 
-  pub fn read(database_name: String) -> Result<Self> {
-    match DatabaseManager::read(database_name) {
+  pub fn read(database_name: String, new_data: &impl Serialize) -> Result<Self> {
+    match DatabaseManager::read(
+      database_name.clone(),
+      new_data,
+    ) {
       Ok(data) => Ok(data),
       Err(error) => return Err(error),
     }
   }
 
   pub fn save(database_name: String, data: &Database) -> Result<()> {
-    DatabaseManager::save(database_name, data);
-    Ok(())
+    match DatabaseManager::save(database_name, data) {
+      Ok(()) => Ok(()),
+      Err(error) => return Err(error),
+    }
   }
 
   // 得到指定的 database 里的所有 table name

@@ -28,21 +28,21 @@ impl DatabaseManager {
   }
 
   // 从磁盘读取到内存
-  pub fn read<T: DeserializeOwned>(filename: String) -> Result<T> {
-    // 先看 filename 在不在，不在就创建
+  pub fn read<T: DeserializeOwned>(filename: String, new_data: &impl Serialize) -> Result<T> {
+    // 先看 filename 在不在，不在就创建这个 file
     if let Err(_) = File::open(filename.clone()) {
+      println!("{} creating...", filename);
       DatabaseManager::write_data(
         &filename.to_string(),
-        &DatabaseManager::new()
+        new_data,
       );
+      println!("creating {} done", filename);
     }
 
     match
       DatabaseManager::read_data(&filename.to_string()) {
         Ok(data) => Ok(data),
-        Err(error) => {
-          return Err(error);
-        },
+        Err(error) => return Err(error),
     }
   }
 

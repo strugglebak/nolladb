@@ -51,31 +51,19 @@ fn main() -> rustyline::Result<()> {
 
   // 初始化 database 相关
   // TODO: 待优化
-  let mut database = Database::new(database_name.to_string());
-  let mut database_manager = DatabaseManager::new();
+  let mut database:Database;
+  let mut database_manager:DatabaseManager;
   let database_manager_file = String::from(".dmf");
 
-  // 先读 database 文件
-  println!("reading {}...", database_name.clone());
-  match Database::read(database_name.clone()) {
-    Ok(data) => {
-      database = data;
-      println!("reading {} done", database_name);
-      // 然后读 database_manager 文件
-      match DatabaseManager::read(database_manager_file.clone()) {
-        Ok(data) => {
-          database_manager = data;
-          if !database_manager.has_database(database.database_name.clone()) {
-            database_manager.database.insert(
-              database.database_name.clone(),
-              database.clone()
-            );
-          }
-        },
-        Err(error) => eprintln!("An error occurred: {:?}", error),
-      }
+  match Database::init(database_name.clone(), database_manager_file.clone()) {
+    Ok((new_database, new_database_manager)) => {
+      database = new_database;
+      database_manager = new_database_manager;
     },
-    Err(error) => eprintln!("An error occurred: {:?}", error),
+    Err(error) => {
+      eprintln!("An error occurred: {:?}", error);
+      process::exit(1)
+    }
   }
 
   // 创建 repl helper
@@ -129,12 +117,18 @@ fn main() -> rustyline::Result<()> {
                   },
                   MetaCommand::Read(database_name) => {
                     println!("reading {}...", database_name.clone());
-                    match Database::read(database_name.clone()) {
+                    match Database::read(
+                      database_name.clone(),
+                      &Database::new(database_name.clone()),
+                    ) {
                       Ok(data) => {
                         database = data;
                         println!("reading {} done", database_name);
                         // 然后读 database_manager 文件
-                        match DatabaseManager::read(database_manager_file.clone()) {
+                        match DatabaseManager::read(
+                          database_manager_file.clone(),
+                          &DatabaseManager::new(),
+                        ) {
                           Ok(data) => {
                             database_manager = data;
                             if !database_manager.has_database(database.database_name.clone()) {
