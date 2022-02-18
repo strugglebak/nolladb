@@ -34,6 +34,13 @@ cd nolladb
 cargo run test.db
 ```
 
+## 测试
+
+```bash
+cd nolladb
+cargo test
+```
+
 ## Roadmaps
 
 - [ ] 实现简单 `SELECT` 查询
