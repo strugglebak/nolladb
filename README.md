@@ -26,6 +26,14 @@ nolladb 是一个基于 Rust 开发的 simple 关系型数据库
 - [x] 拥有专门为 `PRIMARY KEY` 初始化的内存型 `BTreeMap` 索引
 - [x] 支持唯一 `KEY` 约束
 
+## 安装以及调试
+
+```bash
+git clone git@github.com:strugglebak/nolladb.git
+cd nolladb
+cargo run test.db
+```
+
 ## Roadmaps
 
 - [ ] 实现简单 `SELECT` 查询
