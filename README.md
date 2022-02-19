@@ -56,7 +56,7 @@ cargo test
 - [ ] 实现复合索引
 - [ ] 实现连接管理
 - [ ] 实现不同场景下的存储引擎
-  - [ ] 实现 `LSM Tree && SSTable` 应对大量写的场景
+  - [ ] 实现 `LSM Tree && Sorted Strings Table` 应对大量写的场景
   - [ ] 实现更快的 `B-Tree` 应对大量读的场景
 
 ## 协议
