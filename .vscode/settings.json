@@ -12,6 +12,7 @@
     "rustyline",
     "serde",
     "sqlparser",
+    "struct",
     "strugglebak",
     "testdb",
     "thiserror"
