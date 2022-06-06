@@ -2,6 +2,18 @@
 
 nolladb 是一个基于 Rust 开发的 simple 关系型数据库
 
+用 Rust 之前，为了理解 Rust 的一些核心概念，我写了一篇博客
+
+[Rust所有权、生命周期、内存管理](https://strugglebak.github.io/2022/06/06/Rust%E6%89%80%E6%9C%89%E6%9D%83%E3%80%81%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E3%80%81%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/)
+
+在写这个数据库时，为了充分理解 B-Tree 这个数据结构，我还写了一篇关于这个的博客
+
+[B-Tree的Rust实现及其原理](https://strugglebak.github.io/2022/06/06/B-Tree%E7%9A%84Rust%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%85%B6%E5%8E%9F%E7%90%86)
+
+## 运行
+
+![](./assets/animation.gif)
+
 ## 核心思路
 
 ### 整体数据流
